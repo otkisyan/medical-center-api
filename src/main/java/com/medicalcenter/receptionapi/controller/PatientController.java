@@ -1,0 +1,82 @@
+package com.medicalcenter.receptionapi.controller;
+
+import com.medicalcenter.receptionapi.dto.patient.PatientDto;
+import com.medicalcenter.receptionapi.service.PatientService;
+import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.time.LocalDate;
+
+@RestController
+@AllArgsConstructor
+@RequestMapping("/patients")
+public class PatientController {
+
+    private final PatientService patientService;
+
+    @GetMapping()
+    public ResponseEntity<Page<PatientDto>> findAllPatients(
+            @RequestParam(name = "name", required = false) String name,
+            @RequestParam(name = "surname", required = false) String surname,
+            @RequestParam(name = "middleName", required = false) String middleName,
+            @RequestParam(name = "birthDate", required = false) LocalDate birthDate,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
+        if (patientService.count() != 0) {
+            Page<PatientDto> patientsPage;
+            patientsPage = patientService.findAllPatients(surname, name, middleName, birthDate, page, pageSize);
+            return ResponseEntity
+                    .ok()
+                    .body(patientsPage);
+        } else {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<PatientDto> findPatientById(@PathVariable("id") Long id) {
+        PatientDto patientDto = patientService.findPatientById(id);
+        return ResponseEntity.ok()
+                .body(patientDto);
+    }
+
+    @PostMapping()
+    public @ResponseBody ResponseEntity<PatientDto> savePatient(@RequestBody PatientDto patientDto) {
+        PatientDto patientResponseDto = patientService.savePatient(patientDto);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(patientDto.getId())
+                .toUri();
+        return ResponseEntity.created(location)
+                .body(patientResponseDto);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<PatientDto> updatePatient(@RequestBody PatientDto patientDto, @PathVariable("id") Long id) {
+        PatientDto patientResponseDto = patientService.updatePatient(patientDto, id);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .build()
+                .toUri();
+        return ResponseEntity.ok()
+                .location(location)
+                .body(patientResponseDto);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePatient(@PathVariable("id") Long id) {
+        patientService.deletePatient(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/count")
+    public long countPatients(){
+        return patientService.count();
+    }
+}

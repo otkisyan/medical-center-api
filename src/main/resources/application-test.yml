@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:tc:mariadb:10.2.14:///test
+    username: test
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: create
+  flyway:
+    enabled: false
