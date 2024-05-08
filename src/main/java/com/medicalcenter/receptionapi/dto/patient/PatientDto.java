@@ -30,7 +30,7 @@ public class PatientDto {
                 .surname(patient.getSurname())
                 .middleName(patient.getMiddleName())
                 .address(patient.getAddress())
-                .phone(patient.getAddress())
+                .phone(patient.getPhone())
                 .messengerContact(patient.getMessengerContact())
                 .birthDate(patient.getBirthDate())
                 .preferentialCategory(patient.getPreferentialCategory())

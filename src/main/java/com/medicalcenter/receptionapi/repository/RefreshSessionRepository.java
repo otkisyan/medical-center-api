@@ -11,5 +11,7 @@ public interface RefreshSessionRepository extends JpaRepository<RefreshSession, 
 
     RefreshSession findByUser_Username(String username);
 
+    long deleteByToken(String token);
+
     boolean existsByToken(String token);
 }

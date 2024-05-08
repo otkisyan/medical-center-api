@@ -14,6 +14,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBadCredentialsException() {
         return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
     }
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException() {
+        return new ResponseEntity<>("Resource not found", HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<String> handleUsernameNotFoundException(UsernameNotFoundException ex) {

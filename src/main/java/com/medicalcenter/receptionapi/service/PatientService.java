@@ -62,14 +62,25 @@ public class PatientService {
     }
 
     public PatientDto savePatient(PatientDto patientDto) {
-        Patient patient = patientRepository.save(PatientDto.toEntity(patientDto));
+        Patient patient;
+        try {
+            patient = patientRepository.save(PatientDto.toEntity(patientDto));
+        }
+        catch (Exception ex){
+            throw new IllegalArgumentException(ex.getMessage());
+        }
         return PatientDto.ofEntity(patient);
     }
 
     public PatientDto updatePatient(PatientDto patientDto, Long id) {
         Patient patientToUpdate = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         BeanUtils.copyProperties(patientDto, patientToUpdate, "id", "appointments");
-        Patient patient = patientRepository.save(patientToUpdate);
+        Patient patient;
+        try {
+            patient = patientRepository.save(patientToUpdate);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException(ex.getMessage());
+        }
         return PatientDto.ofEntity(patient);
     }
 

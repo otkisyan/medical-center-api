@@ -34,7 +34,7 @@ import java.util.Collections;
 @Service
 @AllArgsConstructor
 @Slf4j
-public class AuthenticationService {
+public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
@@ -114,6 +114,17 @@ public class AuthenticationService {
         ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshTokenDto);
         AuthResponseDto authResponseDto = createAuthResponseDto(accessTokenDto, refreshTokenDto);
         return new Pair<>(refreshTokenCookie, authResponseDto);
+    }
+
+    public void logout(HttpServletRequest request){
+        String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
+        if (refreshToken == null){
+            refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
+        }
+        if (refreshToken != null){
+            RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
+            refreshSessionRepository.delete(refreshSession);
+        }
     }
 
     public boolean validateRefreshToken(HttpServletRequest request){

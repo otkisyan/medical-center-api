@@ -31,7 +31,7 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
+                //exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/patients/**").authenticated()
                         .requestMatchers("/auth/**").permitAll()

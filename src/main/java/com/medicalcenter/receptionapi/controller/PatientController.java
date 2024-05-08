@@ -51,7 +51,7 @@ public class PatientController {
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(patientDto.getId())
+                .buildAndExpand(patientResponseDto.getId())
                 .toUri();
         return ResponseEntity.created(location)
                 .body(patientResponseDto);

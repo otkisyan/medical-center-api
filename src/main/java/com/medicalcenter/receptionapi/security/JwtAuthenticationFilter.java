@@ -21,13 +21,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-    private final List<String> publicUrls = List.of("/auth");
+    private final List<String> protectedUrls = List.of("/patients");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try {
-            if (isPublicPath(request)) {
+            if (!isProtectedPath(request)) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -39,10 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private boolean isPublicPath(HttpServletRequest request) {
+    private boolean isProtectedPath(HttpServletRequest request) {
         String path = request.getServletPath();
-        for (String publicUrl : publicUrls) {
-            if (path.startsWith(publicUrl)) {
+        for (String protectedUrl : protectedUrls) {
+            if (path.startsWith(protectedUrl)) {
                 return true;
             }
         }
