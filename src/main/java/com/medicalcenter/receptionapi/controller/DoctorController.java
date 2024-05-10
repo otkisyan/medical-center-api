@@ -1,6 +1,7 @@
 package com.medicalcenter.receptionapi.controller;
 
-import com.medicalcenter.receptionapi.dto.doctor.DoctorDto;
+import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
+import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.service.DoctorService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,7 +21,7 @@ public class DoctorController {
     private final DoctorService doctorService;
 
     @GetMapping()
-    public ResponseEntity<Page<DoctorDto>> findAllPatients(
+    public ResponseEntity<Page<DoctorResponseDto>> findAllDoctors(
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "surname", required = false) String surname,
             @RequestParam(name = "middleName", required = false) String middleName,
@@ -28,7 +29,7 @@ public class DoctorController {
             @RequestParam(name = "medicalSpecialty", required = false) String medicalSpecialty,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
-            Page<DoctorDto> doctorsPage = doctorService.findAllDoctors(surname, name, middleName, birthDate, medicalSpecialty, page, pageSize);
+            Page<DoctorResponseDto> doctorsPage = doctorService.findAllDoctors(surname, name, middleName, birthDate, medicalSpecialty, page, pageSize);
             return ResponseEntity
                     .ok()
                     .body(doctorsPage);
@@ -36,15 +37,15 @@ public class DoctorController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DoctorDto> findPatientById(@PathVariable("id") Long id) {
-        DoctorDto doctorDto = doctorService.findDoctorById(id);
+    public ResponseEntity<DoctorResponseDto> findDoctorById(@PathVariable("id") Long id) {
+        DoctorResponseDto doctorResponseDto = doctorService.findDoctorById(id);
         return ResponseEntity.ok()
-                .body(doctorDto);
+                .body(doctorResponseDto);
     }
 
     @PostMapping()
-    public @ResponseBody ResponseEntity<DoctorDto> savePatient(@RequestBody DoctorDto doctorDto) {
-        DoctorDto doctorResponseDto = doctorService.saveDoctor(doctorDto);
+    public @ResponseBody ResponseEntity<DoctorResponseDto> saveDoctor(@RequestBody DoctorRequestDto doctorRequestDto) {
+        DoctorResponseDto doctorResponseDto = doctorService.saveDoctor(doctorRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
@@ -55,8 +56,8 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DoctorDto> updatePatient(@RequestBody DoctorDto doctorDto, @PathVariable("id") Long id) {
-        DoctorDto doctorResponseDto = doctorService.updateDoctor(doctorDto, id);
+    public ResponseEntity<DoctorResponseDto> updateDoctor(@RequestBody DoctorRequestDto doctorRequestDto, @PathVariable("id") Long id) {
+        DoctorResponseDto doctorResponseDto = doctorService.updateDoctor(doctorRequestDto, id);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .build()
@@ -67,7 +68,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletePatient(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteDoctor(@PathVariable("id") Long id) {
         doctorService.deleteDoctor(id);
         return ResponseEntity.ok().build();
     }

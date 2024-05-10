@@ -1,7 +1,7 @@
 package com.medicalcenter.receptionapi.dto.doctor;
 
 import com.medicalcenter.receptionapi.domain.Doctor;
-import com.medicalcenter.receptionapi.dto.office.OfficeDto;
+import com.medicalcenter.receptionapi.dto.office.OfficeResponseDto;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Builder
 @Data
-public class DoctorDto implements Serializable {
+public class DoctorResponseDto implements Serializable {
 
     private Long id;
     private String name;
@@ -22,10 +22,10 @@ public class DoctorDto implements Serializable {
     private LocalDate birthDate;
     private String medicalSpecialty;
     private String qualificationCategory;
-    private OfficeDto office;
+    private OfficeResponseDto office;
 
-    public static DoctorDto ofEntity(Doctor doctor) {
-        return DoctorDto.builder()
+    public static DoctorResponseDto ofEntity(Doctor doctor) {
+        return DoctorResponseDto.builder()
                 .id(doctor.getId())
                 .name(doctor.getName())
                 .surname(doctor.getSurname())
@@ -36,21 +36,7 @@ public class DoctorDto implements Serializable {
                 .birthDate(doctor.getBirthDate())
                 .medicalSpecialty(doctor.getMedicalSpecialty())
                 .qualificationCategory(doctor.getQualificationCategory())
-                .office(OfficeDto.ofEntity(doctor.getOffice()))
-                .build();
-    }
-
-    public static Doctor toEntity(DoctorDto doctorDto) {
-        return Doctor.builder()
-                .name(doctorDto.getName())
-                .surname(doctorDto.getSurname())
-                .middleName(doctorDto.getMiddleName())
-                .address(doctorDto.getAddress())
-                .phone(doctorDto.getPhone())
-                .messengerContact(doctorDto.getMessengerContact())
-                .birthDate(doctorDto.getBirthDate())
-                .medicalSpecialty(doctorDto.getMedicalSpecialty())
-                .qualificationCategory(doctorDto.getQualificationCategory())
+                .office(OfficeResponseDto.ofEntity(doctor.getOffice()))
                 .build();
     }
 }

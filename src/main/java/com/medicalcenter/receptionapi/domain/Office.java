@@ -3,6 +3,9 @@ package com.medicalcenter.receptionapi.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Getter
 @Setter
 @Entity
@@ -23,6 +26,6 @@ public class Office {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToOne(mappedBy = "office")
-    private Doctor doctor;
+    @OneToMany(mappedBy = "office", orphanRemoval = false)
+    private Set<Doctor> doctors = new LinkedHashSet<>();
 }

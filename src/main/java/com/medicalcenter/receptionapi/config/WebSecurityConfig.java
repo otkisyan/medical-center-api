@@ -34,6 +34,8 @@ public class WebSecurityConfig {
                 //exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/patients/**").authenticated()
+                        .requestMatchers("/doctors/**").authenticated()
+                        .requestMatchers("/offices").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

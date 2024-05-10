@@ -1,7 +1,8 @@
 package com.medicalcenter.receptionapi.service;
 
 import com.medicalcenter.receptionapi.domain.Patient;
-import com.medicalcenter.receptionapi.dto.patient.PatientDto;
+import com.medicalcenter.receptionapi.dto.patient.PatientRequestDto;
+import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import lombok.AllArgsConstructor;
@@ -31,12 +32,12 @@ public class PatientService {
         return patientRepository.findAll();
     }
 
-    public Page<PatientDto> findAllPatients(String surname,
-                                            String name,
-                                            String middleName,
-                                            LocalDate birthDate,
-                                            int page,
-                                            int pageSize) {
+    public Page<PatientResponseDto> findAllPatients(String surname,
+                                                    String name,
+                                                    String middleName,
+                                                    LocalDate birthDate,
+                                                    int page,
+                                                    int pageSize) {
 
         Specification<Patient> specs = Specification.where(null);
         if (surname != null && !surname.isBlank()) {
@@ -53,35 +54,35 @@ public class PatientService {
         }
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, pageSize, sort);
-        return patientRepository.findAll(specs, pageable).map(PatientDto::ofEntity);
+        return patientRepository.findAll(specs, pageable).map(PatientResponseDto::ofEntity);
     }
 
-    public PatientDto findPatientById(Long id) {
+    public PatientResponseDto findPatientById(Long id) {
         Patient patient = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        return PatientDto.ofEntity(patient);
+        return PatientResponseDto.ofEntity(patient);
     }
 
-    public PatientDto savePatient(PatientDto patientDto) {
+    public PatientResponseDto savePatient(PatientRequestDto patientRequestDto) {
         Patient patient;
         try {
-            patient = patientRepository.save(PatientDto.toEntity(patientDto));
+            patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
         }
         catch (Exception ex){
             throw new IllegalArgumentException(ex.getMessage());
         }
-        return PatientDto.ofEntity(patient);
+        return PatientResponseDto.ofEntity(patient);
     }
 
-    public PatientDto updatePatient(PatientDto patientDto, Long id) {
+    public PatientResponseDto updatePatient(PatientRequestDto patientRequestDto, Long id) {
         Patient patientToUpdate = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        BeanUtils.copyProperties(patientDto, patientToUpdate, "id", "appointments");
+        BeanUtils.copyProperties(patientRequestDto, patientToUpdate, "id", "appointments");
         Patient patient;
         try {
             patient = patientRepository.save(patientToUpdate);
         } catch (Exception ex) {
             throw new IllegalArgumentException(ex.getMessage());
         }
-        return PatientDto.ofEntity(patient);
+        return PatientResponseDto.ofEntity(patient);
     }
 
     public void deletePatient(Long id) {

@@ -1,14 +1,11 @@
 package com.medicalcenter.receptionapi.service;
 
 import com.medicalcenter.receptionapi.domain.Doctor;
-import com.medicalcenter.receptionapi.domain.Patient;
-import com.medicalcenter.receptionapi.dto.doctor.DoctorDto;
-import com.medicalcenter.receptionapi.dto.patient.PatientDto;
+import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
+import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
-import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
-import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -35,13 +32,13 @@ public class DoctorService {
         return doctorRepository.findAll();
     }
 
-    public Page<DoctorDto> findAllDoctors(String name,
-                                          String surname,
-                                          String middleName,
-                                          LocalDate birthDate,
-                                          String medicalSpecialty,
-                                          int page,
-                                          int pageSize) {
+    public Page<DoctorResponseDto> findAllDoctors(String name,
+                                                  String surname,
+                                                  String middleName,
+                                                  LocalDate birthDate,
+                                                  String medicalSpecialty,
+                                                  int page,
+                                                  int pageSize) {
 
         Specification<Doctor> specs = Specification.where(null);
         if (surname != null && !surname.isBlank()) {
@@ -61,23 +58,23 @@ public class DoctorService {
         }
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, pageSize, sort);
-        return doctorRepository.findAll(specs, pageable).map(DoctorDto::ofEntity);
+        return doctorRepository.findAll(specs, pageable).map(DoctorResponseDto::ofEntity);
     }
 
-    public DoctorDto findDoctorById(Long id) {
-        return doctorRepository.findById(id).map(DoctorDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
+    public DoctorResponseDto findDoctorById(Long id) {
+        return doctorRepository.findById(id).map(DoctorResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }
 
-    public DoctorDto saveDoctor(DoctorDto doctorDto) {
-        Doctor doctor = doctorRepository.save(DoctorDto.toEntity(doctorDto));
-        return DoctorDto.ofEntity(doctor);
+    public DoctorResponseDto saveDoctor(DoctorRequestDto doctorRequestDto) {
+        Doctor doctor = doctorRepository.save(DoctorRequestDto.toEntity(doctorRequestDto));
+        return DoctorResponseDto.ofEntity(doctor);
     }
 
-    public DoctorDto updateDoctor(DoctorDto doctorDto, Long id) {
+    public DoctorResponseDto updateDoctor(DoctorRequestDto doctorRequestDto, Long id) {
         Doctor doctorToUpdate = doctorRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        BeanUtils.copyProperties(doctorDto, doctorToUpdate, "id", "appointments");
+        BeanUtils.copyProperties(doctorRequestDto, doctorToUpdate, "id", "appointments", "office");
         Doctor doctor = doctorRepository.save(doctorToUpdate);
-        return DoctorDto.ofEntity(doctor);
+        return DoctorResponseDto.ofEntity(doctor);
     }
 
     public void deleteDoctor(Long id) {

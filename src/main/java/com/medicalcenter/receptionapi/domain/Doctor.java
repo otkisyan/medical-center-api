@@ -54,7 +54,7 @@ public class Doctor {
     @OneToMany(mappedBy = "doctor", orphanRemoval = true)
     private List<WorkSchedule> workSchedules = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "office_id")
     private Office office;
 

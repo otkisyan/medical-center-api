@@ -12,7 +12,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class PatientDto {
+public class PatientResponseDto {
     private Long id;
     private String name;
     private String surname;
@@ -23,8 +23,8 @@ public class PatientDto {
     private LocalDate birthDate;
     private String preferentialCategory;
 
-    public static PatientDto ofEntity(Patient patient) {
-        return PatientDto.builder()
+    public static PatientResponseDto ofEntity(Patient patient) {
+        return PatientResponseDto.builder()
                 .id(patient.getId())
                 .name(patient.getName())
                 .surname(patient.getSurname())
@@ -34,19 +34,6 @@ public class PatientDto {
                 .messengerContact(patient.getMessengerContact())
                 .birthDate(patient.getBirthDate())
                 .preferentialCategory(patient.getPreferentialCategory())
-                .build();
-    }
-
-    public static Patient toEntity(PatientDto patientDto) {
-        return Patient.builder()
-                .name(patientDto.getName())
-                .surname(patientDto.getSurname())
-                .middleName(patientDto.getMiddleName())
-                .address(patientDto.getAddress())
-                .phone(patientDto.getPhone())
-                .messengerContact(patientDto.getMessengerContact())
-                .birthDate(patientDto.getBirthDate())
-                .preferentialCategory(patientDto.getPreferentialCategory())
                 .build();
     }
 }
