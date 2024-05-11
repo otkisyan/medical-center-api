@@ -2,6 +2,7 @@ package com.medicalcenter.receptionapi.config;
 
 import com.medicalcenter.receptionapi.security.JwtAuthEntryPoint;
 import com.medicalcenter.receptionapi.security.JwtAuthenticationFilter;
+import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class WebSecurityConfig {
 
-    private final JwtAuthEntryPoint jwtAuthEntryPoint;
+    // private final JwtAuthEntryPoint jwtAuthEntryPoint;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,7 +35,7 @@ public class WebSecurityConfig {
                 //exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/patients/**").authenticated()
-                        .requestMatchers("/doctors/**").authenticated()
+                        .requestMatchers("/doctors/**").hasAnyRole(RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
                         .requestMatchers("/offices").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()

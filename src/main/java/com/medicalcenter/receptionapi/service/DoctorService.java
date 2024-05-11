@@ -5,6 +5,7 @@ import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
+import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;

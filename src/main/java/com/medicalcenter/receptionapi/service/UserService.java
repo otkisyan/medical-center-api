@@ -1,8 +1,8 @@
 package com.medicalcenter.receptionapi.service;
 
-import com.medicalcenter.receptionapi.constants.SecurityConstants;
-import com.medicalcenter.receptionapi.domain.RefreshSession;
 import com.medicalcenter.receptionapi.domain.Role;
+import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
+import com.medicalcenter.receptionapi.domain.RefreshSession;
 import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.dto.user.*;
 import com.medicalcenter.receptionapi.exception.InvalidTokenException;
@@ -14,7 +14,8 @@ import com.medicalcenter.receptionapi.repository.RoleRepository;
 import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.JwtTokenProvider;
-import com.medicalcenter.receptionapi.security.JwtType;
+import com.medicalcenter.receptionapi.security.enums.JwtType;
+import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import jakarta.servlet.http.HttpServletRequest;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
@@ -55,7 +56,7 @@ public class UserService {
             throw new UserAlreadyExistsException("user: " + registerRequestDto.getUsername() + " already exists");
         }
         String passwordHash = encoder.encode(registerRequestDto.getPassword());
-        Role role = roleRepository.findByName("RECEPTIONIST");
+        Role role = roleRepository.findByName(RoleAuthority.RECEPTIONIST.authority);
         User user = User.builder()
                 .username(registerRequestDto.getUsername())
                 .password(passwordHash)

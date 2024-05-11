@@ -1,6 +1,6 @@
 package com.medicalcenter.receptionapi.dto.user;
 
-import com.medicalcenter.receptionapi.security.JwtType;
+import com.medicalcenter.receptionapi.security.enums.JwtType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

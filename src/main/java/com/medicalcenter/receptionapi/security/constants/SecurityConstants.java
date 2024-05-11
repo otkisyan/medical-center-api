@@ -1,4 +1,4 @@
-package com.medicalcenter.receptionapi.constants;
+package com.medicalcenter.receptionapi.security.constants;
 
 public class SecurityConstants {
     public static final String AUTHORIZATION_HEADER = "Authorization";

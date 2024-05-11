@@ -2,6 +2,7 @@ package com.medicalcenter.receptionapi.security;
 
 import com.medicalcenter.receptionapi.exception.InvalidTokenException;
 import com.medicalcenter.receptionapi.exception.InvalidTokenTypeException;
+import com.medicalcenter.receptionapi.security.enums.JwtType;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
