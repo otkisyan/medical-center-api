@@ -1,10 +1,12 @@
 package com.medicalcenter.receptionapi.service;
 
 import com.medicalcenter.receptionapi.domain.Doctor;
+import com.medicalcenter.receptionapi.domain.Office;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
+import com.medicalcenter.receptionapi.repository.OfficeRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import lombok.AllArgsConstructor;
@@ -18,12 +20,14 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
+    private final OfficeRepository officeRepository;
 
     public long count() {
         return doctorRepository.count();
@@ -67,15 +71,34 @@ public class DoctorService {
     }
 
     public DoctorResponseDto saveDoctor(DoctorRequestDto doctorRequestDto) {
-        Doctor doctor = doctorRepository.save(DoctorRequestDto.toEntity(doctorRequestDto));
+        Optional<Office> officeOptional = officeRepository.findById(doctorRequestDto.getOfficeId());
+        Doctor doctor = DoctorRequestDto.toEntity(doctorRequestDto);
+
+        if(officeOptional.isPresent()){
+            Office office = officeOptional.get();
+            doctor.setOffice(office);
+        }
+
+        doctor = doctorRepository.save(doctor);
         return DoctorResponseDto.ofEntity(doctor);
     }
 
     public DoctorResponseDto updateDoctor(DoctorRequestDto doctorRequestDto, Long id) {
         Doctor doctorToUpdate = doctorRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        BeanUtils.copyProperties(doctorRequestDto, doctorToUpdate, "id", "appointments", "office");
-        Doctor doctor = doctorRepository.save(doctorToUpdate);
-        return DoctorResponseDto.ofEntity(doctor);
+        Doctor updateRequestDoctor = DoctorRequestDto.toEntity(doctorRequestDto);
+        BeanUtils.copyProperties(updateRequestDoctor, doctorToUpdate, "id", "appointments", "office", "user", "workSchedules");
+        if(doctorRequestDto.getOfficeId() != null) {
+            Optional<Office> officeOptional = officeRepository.findById(doctorRequestDto.getOfficeId());
+            if (officeOptional.isPresent()) {
+                Office office = officeOptional.get();
+                doctorToUpdate.setOffice(office);
+            }
+        }
+        else{
+            doctorToUpdate.setOffice(null);
+        }
+        Doctor updatedDoctor = doctorRepository.save(doctorToUpdate);
+        return DoctorResponseDto.ofEntity(updatedDoctor);
     }
 
     public void deleteDoctor(Long id) {
