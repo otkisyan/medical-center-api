@@ -21,12 +21,12 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequestDto registerRequestDto) {
         userService.saveUser(registerRequestDto);
-        return new ResponseEntity<>(registerRequestDto.getUsername() + " is successfully registered", HttpStatus.OK);
+        return new ResponseEntity<>(registerRequestDto.getUserCredentialsDto().getUsername() + " is successfully registered", HttpStatus.OK);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody AuthRequestDto authRequestDto) {
-        Pair<ResponseCookie, AuthResponseDto> responsePair = userService.authUser(authRequestDto);
+    public ResponseEntity<AuthResponseDto> login(@RequestBody UserCredentialsDto userCredentialsDto) {
+        Pair<ResponseCookie, AuthResponseDto> responsePair = userService.authUser(userCredentialsDto);
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, responsePair.getKey().toString())

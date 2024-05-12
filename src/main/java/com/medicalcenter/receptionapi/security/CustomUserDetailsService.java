@@ -28,6 +28,10 @@ public class CustomUserDetailsService implements UserDetailsService {
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
+                user.getAccountNonExpired(),
+                user.getAccountNonLocked(),
+                user.getCredentialsNonExpired(),
+                user.getEnabled(),
                 user.getRoles().stream().map((role) -> new SimpleGrantedAuthority(role.getName()))
                         .collect(Collectors.toList())
         );

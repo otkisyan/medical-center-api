@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.dto.user;
 
-import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RegisterRequestDto {
-    UserCredentialsDto userCredentialsDto;
-    RoleAuthority role;
+public class UserCredentialsDto {
+    private String username;
+    private String password;
 }

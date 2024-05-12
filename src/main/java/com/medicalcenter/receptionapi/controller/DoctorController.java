@@ -2,7 +2,10 @@ package com.medicalcenter.receptionapi.controller;
 
 import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
+import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseWithUserCredentialsDto;
+import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.service.DoctorService;
+import com.medicalcenter.receptionapi.service.WorkScheduleService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -19,6 +23,7 @@ public class DoctorController {
 
 
     private final DoctorService doctorService;
+    private final WorkScheduleService workScheduleService;
 
     @GetMapping()
     public ResponseEntity<Page<DoctorResponseDto>> findAllDoctors(
@@ -36,6 +41,16 @@ public class DoctorController {
 
     }
 
+    @GetMapping("/{id}/work-schedules")
+    public ResponseEntity<Page<WorkScheduleResponseDto>> findDoctorWorkSchedules(
+            @PathVariable("id") Long id,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "7") Integer pageSize
+    ){
+        Page<WorkScheduleResponseDto> workScheduleResponseDtoList = doctorService.findDoctorWorkSchedules(page, pageSize, id);
+        return ResponseEntity.ok(workScheduleResponseDtoList);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<DoctorResponseDto> findDoctorById(@PathVariable("id") Long id) {
         DoctorResponseDto doctorResponseDto = doctorService.findDoctorById(id);
@@ -43,16 +58,18 @@ public class DoctorController {
                 .body(doctorResponseDto);
     }
 
+
+
     @PostMapping()
-    public @ResponseBody ResponseEntity<DoctorResponseDto> saveDoctor(@RequestBody DoctorRequestDto doctorRequestDto) {
-        DoctorResponseDto doctorResponseDto = doctorService.saveDoctor(doctorRequestDto);
+    public @ResponseBody ResponseEntity<DoctorResponseWithUserCredentialsDto> saveDoctor(@RequestBody DoctorRequestDto doctorRequestDto) {
+        DoctorResponseWithUserCredentialsDto doctorResponseWithUserCredentialsDto = doctorService.saveDoctor(doctorRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{id}")
-                .buildAndExpand(doctorResponseDto.getId())
+                .buildAndExpand(doctorResponseWithUserCredentialsDto.getDoctorResponseDto().getId())
                 .toUri();
         return ResponseEntity.created(location)
-                .body(doctorResponseDto);
+                .body(doctorResponseWithUserCredentialsDto);
     }
 
     @PutMapping("/{id}")

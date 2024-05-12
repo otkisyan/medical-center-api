@@ -1,6 +1,9 @@
 package com.medicalcenter.receptionapi.dto.user;
 
+import com.medicalcenter.receptionapi.domain.Role;
+import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
+import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,6 +41,19 @@ public class UserDetailsDto {
                 .accountNonLocked(customUserDetails.isAccountNonLocked())
                 .credentialsNonExpired(customUserDetails.isCredentialsNonExpired())
                 .enabled(customUserDetails.isEnabled())
+                .build();
+    }
+
+    public static UserDetailsDto ofEntity(User user){
+        List<String> roles = user.getRoles().stream().map(Role::getName).toList();
+        return UserDetailsDto.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .roles(roles)
+                .accountNonExpired(user.getAccountNonExpired())
+                .accountNonLocked(user.getAccountNonLocked())
+                .credentialsNonExpired(user.getCredentialsNonExpired())
+                .enabled(user.getEnabled())
                 .build();
     }
 }

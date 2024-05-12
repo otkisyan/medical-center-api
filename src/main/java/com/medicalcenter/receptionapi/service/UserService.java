@@ -15,7 +15,6 @@ import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.JwtTokenProvider;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
-import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import jakarta.servlet.http.HttpServletRequest;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
@@ -31,6 +30,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.Random;
 
 @Service
 @AllArgsConstructor
@@ -50,36 +50,41 @@ public class UserService {
      * @param registerRequestDto An object containing user registration credentials (username and password)
      * @throws UserAlreadyExistsException If a user with the given username already exists in the system.
      */
-    public void saveUser(RegisterRequestDto registerRequestDto) {
-        boolean exists = userRepository.existsByUsername(registerRequestDto.getUsername());
+    public UserDetailsDto saveUser(RegisterRequestDto registerRequestDto) {
+        boolean exists = userRepository.existsByUsername(registerRequestDto.getUserCredentialsDto().getUsername());
         if (exists) {
-            throw new UserAlreadyExistsException("user: " + registerRequestDto.getUsername() + " already exists");
+            throw new UserAlreadyExistsException("user: " + registerRequestDto.getUserCredentialsDto().getUsername() + " already exists");
         }
-        String passwordHash = encoder.encode(registerRequestDto.getPassword());
-        Role role = roleRepository.findByName(RoleAuthority.RECEPTIONIST.authority);
+        String passwordHash = encoder.encode(registerRequestDto.getUserCredentialsDto().getPassword());
+        Role role = roleRepository.findByName(registerRequestDto.getRole().authority);
         User user = User.builder()
-                .username(registerRequestDto.getUsername())
+                .username(registerRequestDto.getUserCredentialsDto().getUsername())
                 .password(passwordHash)
                 .roles(Collections.singletonList(role))
+                .accountNonExpired(true)
+                .accountNonLocked(true)
+                .credentialsNonExpired(true)
+                .enabled(true)
                 .build();
-        userRepository.save(user);
+        User newUser = userRepository.save(user);
+        return UserDetailsDto.ofEntity(newUser);
     }
 
     /**
-     * Authenticates a user based on the provided {@link AuthRequestDto} and generates access and refresh tokens upon successful authentication.
+     * Authenticates a user based on the provided {@link UserCredentialsDto} and generates access and refresh tokens upon successful authentication.
      *
-     * @param authRequestDto An object containing the user's authentication credentials (username and password).
+     * @param userCredentialsDto An object containing the user's authentication credentials (username and password).
      * @return A Pair containing a ResponseCookie representing the refresh token cookie and
      * an AuthResponseDto containing the generated access and refresh tokens along with their expirations dates
      * @throws org.springframework.security.core.AuthenticationException               If authentication fails.
      * @throws UsernameNotFoundException If the user is not found.
      */
-    public Pair<ResponseCookie, AuthResponseDto> authUser(AuthRequestDto authRequestDto) {
+    public Pair<ResponseCookie, AuthResponseDto> authUser(UserCredentialsDto userCredentialsDto) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                authRequestDto.getUsername(),
-                authRequestDto.getPassword()));
+                userCredentialsDto.getUsername(),
+                userCredentialsDto.getPassword()));
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        User user = findUserByUsername(authRequestDto.getUsername());
+        User user = findUserByUsername(userCredentialsDto.getUsername());
         TokenDto refreshTokenDto = jwtTokenProvider.generateRefreshToken(userDetails);
         TokenDto accessTokenDto = jwtTokenProvider.generateAccessToken(userDetails);
         refreshSessionRepository.save(RefreshSession.builder()
@@ -197,5 +202,32 @@ public class UserService {
         } catch (IllegalArgumentException | NullPointerException ex) {
             throw new InvalidTokenTypeException();
         }
+    }
+
+    private String generateRandomString(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return sb.toString();
+    }
+
+    public boolean userExistsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public UserCredentialsDto generateRandomCredentials() {
+        String username = generateRandomString(8);
+        String password = generateRandomString(12);
+        UserCredentialsDto credentials = UserCredentialsDto.builder()
+                .username(username)
+                .password(password)
+                .build();
+        if (userExistsByUsername(username)) {
+            return generateRandomCredentials();
+        }
+        return credentials;
     }
 }

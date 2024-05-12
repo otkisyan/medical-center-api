@@ -25,6 +25,18 @@ public class User {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "account_non_expired", nullable = false)
+    private Boolean accountNonExpired;
+
+    @Column(name = "account_non_locked", nullable = false)
+    private Boolean accountNonLocked;
+
+    @Column(name = "credentials_non_expired", nullable = false)
+    private Boolean credentialsNonExpired;
+
+    @Column(name = "enabled", nullable = false)
+    private Boolean enabled;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

@@ -1,12 +1,17 @@
 package com.medicalcenter.receptionapi.service;
 
-import com.medicalcenter.receptionapi.domain.Doctor;
-import com.medicalcenter.receptionapi.domain.Office;
+import com.medicalcenter.receptionapi.domain.*;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
+import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseWithUserCredentialsDto;
+import com.medicalcenter.receptionapi.dto.user.RegisterRequestDto;
+import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
+import com.medicalcenter.receptionapi.dto.user.UserDetailsDto;
+import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.OfficeRepository;
+import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import lombok.AllArgsConstructor;
@@ -28,6 +33,9 @@ public class DoctorService {
 
     private final DoctorRepository doctorRepository;
     private final OfficeRepository officeRepository;
+    private final UserRepository userRepository;
+    private final WorkScheduleService workScheduleService;
+    private final UserService userService;
 
     public long count() {
         return doctorRepository.count();
@@ -70,17 +78,36 @@ public class DoctorService {
         return doctorRepository.findById(id).map(DoctorResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }
 
-    public DoctorResponseDto saveDoctor(DoctorRequestDto doctorRequestDto) {
-        Optional<Office> officeOptional = officeRepository.findById(doctorRequestDto.getOfficeId());
+    public Page<WorkScheduleResponseDto> findDoctorWorkSchedules(int page, int pageSize, Long doctorId){
+        findDoctorById(doctorId);
+        return workScheduleService.findWorkSchedulesByDoctorId(page, pageSize, doctorId);
+    }
+
+    public DoctorResponseWithUserCredentialsDto saveDoctor(DoctorRequestDto doctorRequestDto) {
         Doctor doctor = DoctorRequestDto.toEntity(doctorRequestDto);
-
-        if(officeOptional.isPresent()){
-            Office office = officeOptional.get();
-            doctor.setOffice(office);
+        if(doctorRequestDto.getOfficeId() != null) {
+            Optional<Office> officeOptional = officeRepository.findById(doctorRequestDto.getOfficeId());
+            if (officeOptional.isPresent()) {
+                Office office = officeOptional.get();
+                doctor.setOffice(office);
+            }
         }
-
+        UserCredentialsDto userCredentialsDto = userService.generateRandomCredentials();
+        RegisterRequestDto registerRequestDto = RegisterRequestDto.builder()
+                .userCredentialsDto(userCredentialsDto)
+                .role(RoleAuthority.DOCTOR)
+                .build();
+        UserDetailsDto userDetailsDto = userService.saveUser(registerRequestDto);
+        Optional<User> user = userRepository.findByUsername(userDetailsDto.getUsername());
+        if (user.isPresent()) {
+            doctor.setUser(user.get());
+        }
         doctor = doctorRepository.save(doctor);
-        return DoctorResponseDto.ofEntity(doctor);
+        workScheduleService.createDoctorEmptyWorkSchedules(doctor);
+        return DoctorResponseWithUserCredentialsDto.builder()
+                .doctorResponseDto(DoctorResponseDto.ofEntity(doctor))
+                .userCredentialsDto(userCredentialsDto)
+                .build();
     }
 
     public DoctorResponseDto updateDoctor(DoctorRequestDto doctorRequestDto, Long id) {
@@ -94,12 +121,13 @@ public class DoctorService {
                 doctorToUpdate.setOffice(office);
             }
         }
-        else{
+        else {
             doctorToUpdate.setOffice(null);
         }
         Doctor updatedDoctor = doctorRepository.save(doctorToUpdate);
         return DoctorResponseDto.ofEntity(updatedDoctor);
     }
+
 
     public void deleteDoctor(Long id) {
         doctorRepository.deleteById(id);
