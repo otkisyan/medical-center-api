@@ -19,14 +19,22 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private ResponseEntity<ErrorResponse> buildErrorResponse(String message, HttpStatus status, HttpServletRequest request) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .message(message)
+                .error(status.getReasonPhrase())
+                .path(request.getRequestURI())
+                .status(status.value())
+                .timestamp(new Date())
+                .build();
+        return new ResponseEntity<>(errorResponse, status);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ValidationErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex,
@@ -36,19 +44,20 @@ public class GlobalExceptionHandler {
                 .stream()
                 .map(fieldError -> new BindingError(fieldError.getField(), fieldError.getDefaultMessage()))
                 .toList();
-
         return new ResponseEntity<>(ValidationErrorResponse.builder()
                 .message("Validation error")
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .timestamp(LocalDateTime.now())
+                .timestamp(new Date())
                 .fieldErrors(fieldErrors)
                 .path(request.getRequestURI())
                 .build(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<String> handleConstraintViolationException(ConstraintViolationException ex) {
-        return new ResponseEntity<>("Constraint Violation", HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex,
+                                                                            HttpServletRequest request) {
+        return buildErrorResponse("Constraint Violation", HttpStatus.BAD_REQUEST, request);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -120,16 +129,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException ex,
                                                                         HttpServletRequest request) {
         return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
-    }
-
-    private ResponseEntity<ErrorResponse> buildErrorResponse(String message, HttpStatus status, HttpServletRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.builder()
-                .message(message)
-                .path(request.getRequestURI())
-                .status(status.value())
-                .timestamp(LocalDateTime.now())
-                .build();
-        return new ResponseEntity<>(errorResponse, status);
     }
 }
 

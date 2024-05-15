@@ -9,16 +9,18 @@ import org.springframework.validation.FieldError;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @AllArgsConstructor
 @Data
 @NoArgsConstructor
 @Builder
-public class ValidationErrorResponse implements Serializable {
+public class ValidationErrorResponse{
     private String message;
     private String path;
     private int status;
-    private LocalDateTime timestamp;
+    private String error;
+    private Date timestamp;
     List<BindingError> fieldErrors;
 }
