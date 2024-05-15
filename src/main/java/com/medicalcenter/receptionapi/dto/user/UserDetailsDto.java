@@ -3,7 +3,6 @@ package com.medicalcenter.receptionapi.dto.user;
 import com.medicalcenter.receptionapi.domain.Role;
 import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
-import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +10,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 

@@ -1,16 +1,12 @@
 package com.medicalcenter.receptionapi.repository;
 
 import com.medicalcenter.receptionapi.domain.Appointment;
-import com.medicalcenter.receptionapi.domain.Doctor;
-import com.medicalcenter.receptionapi.domain.Patient;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface AppointmentRepository extends JpaRepository<Appointment, Long>, JpaSpecificationExecutor<Appointment> {
     List<Appointment> findByDoctor_IdAndDate(Long id, LocalDate date);

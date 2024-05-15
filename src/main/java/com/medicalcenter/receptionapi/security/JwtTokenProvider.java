@@ -1,7 +1,7 @@
 package com.medicalcenter.receptionapi.security;
 
-import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.dto.user.TokenDto;
+import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

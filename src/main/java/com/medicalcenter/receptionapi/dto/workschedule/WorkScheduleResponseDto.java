@@ -2,7 +2,6 @@ package com.medicalcenter.receptionapi.dto.workschedule;
 
 import com.medicalcenter.receptionapi.domain.WorkSchedule;
 import com.medicalcenter.receptionapi.dto.dayofweek.DayOfWeekResponseDto;
-import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

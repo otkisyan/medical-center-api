@@ -3,6 +3,7 @@ package com.medicalcenter.receptionapi.service;
 import com.medicalcenter.receptionapi.domain.Patient;
 import com.medicalcenter.receptionapi.dto.patient.PatientRequestDto;
 import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
+import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import lombok.AllArgsConstructor;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;

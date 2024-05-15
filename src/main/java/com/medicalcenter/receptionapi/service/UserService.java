@@ -1,8 +1,7 @@
 package com.medicalcenter.receptionapi.service;
 
-import com.medicalcenter.receptionapi.domain.Role;
-import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.domain.RefreshSession;
+import com.medicalcenter.receptionapi.domain.Role;
 import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.dto.user.*;
 import com.medicalcenter.receptionapi.exception.InvalidTokenException;
@@ -14,6 +13,7 @@ import com.medicalcenter.receptionapi.repository.RoleRepository;
 import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.JwtTokenProvider;
+import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
 import jakarta.servlet.http.HttpServletRequest;
 import javafx.util.Pair;
@@ -23,6 +23,8 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -76,8 +78,8 @@ public class UserService {
      * @param userCredentialsDto An object containing the user's authentication credentials (username and password).
      * @return A Pair containing a ResponseCookie representing the refresh token cookie and
      * an AuthResponseDto containing the generated access and refresh tokens along with their expirations dates
-     * @throws org.springframework.security.core.AuthenticationException               If authentication fails.
-     * @throws UsernameNotFoundException If the user is not found.
+     * @throws org.springframework.security.core.AuthenticationException If authentication fails.
+     * @throws UsernameNotFoundException                                 If the user is not found.
      */
     public Pair<ResponseCookie, AuthResponseDto> authUser(UserCredentialsDto userCredentialsDto) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -109,7 +111,7 @@ public class UserService {
      * @throws UsernameNotFoundException     If the associated user is not found in the repository.
      */
     public Pair<ResponseCookie, AuthResponseDto> refresh(HttpServletRequest request) {
-        String refreshToken = getRefreshToken(request) ;
+        String refreshToken = getRefreshToken(request);
         String username = jwtTokenProvider.getUsernameFromJwt(refreshToken);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
         TokenDto refreshTokenDto = jwtTokenProvider.generateRefreshToken(userDetails);
@@ -122,41 +124,41 @@ public class UserService {
         return new Pair<>(refreshTokenCookie, authResponseDto);
     }
 
-    public void logout(HttpServletRequest request){
+    public void logout(HttpServletRequest request) {
         String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
-        if (refreshToken == null){
+        if (refreshToken == null) {
             refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
         }
-        if (refreshToken != null){
+        if (refreshToken != null) {
             RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
             refreshSessionRepository.delete(refreshSession);
         }
     }
 
-    public boolean validateRefreshToken(HttpServletRequest request){
+    public boolean validateRefreshToken(HttpServletRequest request) {
         String refreshToken = getRefreshToken(request);
         RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
         return refreshToken != null && refreshSession != null;
     }
 
-    public boolean validateRefreshToken(String refreshToken){
+    public boolean validateRefreshToken(String refreshToken) {
         RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
         return refreshToken != null && refreshSession != null;
     }
 
-    public UserDetailsDto getUserDetailsDto(HttpServletRequest request){
-       String refreshToken = getRefreshToken(request);
-       validateRefreshToken(refreshToken);
-       String username = jwtTokenProvider.getUsernameFromJwt(refreshToken);
-       CustomUserDetails customUserDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
-       return UserDetailsDto.ofUserDetails(customUserDetails);
+    public UserDetailsDto getUserDetailsDto(HttpServletRequest request) {
+        String refreshToken = getRefreshToken(request);
+        validateRefreshToken(refreshToken);
+        String username = jwtTokenProvider.getUsernameFromJwt(refreshToken);
+        CustomUserDetails customUserDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
+        return UserDetailsDto.ofUserDetails(customUserDetails);
     }
 
-    public String getRefreshToken(HttpServletRequest request){
+    public String getRefreshToken(HttpServletRequest request) {
         String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
-        if(refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)){
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
             refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
-            if (refreshToken == null || jwtTokenProvider.validateToken(refreshToken)){
+            if (refreshToken == null || jwtTokenProvider.validateToken(refreshToken)) {
                 throw new InvalidTokenException();
             }
         }
@@ -165,6 +167,24 @@ public class UserService {
             throw new InvalidTokenTypeException();
         }
         return refreshToken;
+    }
+
+    public Authentication getAuthentication() {
+        return SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    public boolean hasAnyAuthority(String... authorities) {
+        Authentication authentication = getAuthentication();
+        if (authentication != null) {
+            for (GrantedAuthority grantedAuthority : authentication.getAuthorities()) {
+                for (String authority : authorities) {
+                    if (authority.equals(grantedAuthority.getAuthority())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     private AuthResponseDto createAuthResponseDto(TokenDto accessToken, TokenDto refreshToken) {

@@ -1,6 +1,8 @@
 package com.medicalcenter.receptionapi.service;
 
-import com.medicalcenter.receptionapi.domain.*;
+import com.medicalcenter.receptionapi.domain.Doctor;
+import com.medicalcenter.receptionapi.domain.Office;
+import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseWithUserCredentialsDto;

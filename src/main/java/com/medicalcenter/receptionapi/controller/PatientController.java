@@ -5,7 +5,6 @@ import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.service.PatientService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -28,15 +27,12 @@ public class PatientController {
             @RequestParam(name = "birthDate", required = false) LocalDate birthDate,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
-        if (patientService.count() != 0) {
-            Page<PatientResponseDto> patientsPage;
-            patientsPage = patientService.findAllPatients(surname, name, middleName, birthDate, page, pageSize);
-            return ResponseEntity
-                    .ok()
-                    .body(patientsPage);
-        } else {
-            return new ResponseEntity<>(HttpStatus.OK);
-        }
+        Page<PatientResponseDto> patientsPage =
+                patientService.findAllPatients(surname, name, middleName, birthDate, page, pageSize);
+        return ResponseEntity
+                .ok()
+                .body(patientsPage);
+
     }
 
     @GetMapping("/{id}")
@@ -61,12 +57,7 @@ public class PatientController {
     @PutMapping("/{id}")
     public ResponseEntity<PatientResponseDto> updatePatient(@RequestBody PatientRequestDto patientRequestDto, @PathVariable("id") Long id) {
         PatientResponseDto patientResponseDto = patientService.updatePatient(patientRequestDto, id);
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .build()
-                .toUri();
         return ResponseEntity.ok()
-                .location(location)
                 .body(patientResponseDto);
     }
 
@@ -77,7 +68,7 @@ public class PatientController {
     }
 
     @GetMapping("/count")
-    public long countPatients(){
+    public long countPatients() {
         return patientService.count();
     }
 }

@@ -1,6 +1,9 @@
 package com.medicalcenter.receptionapi.controller;
 
-import com.medicalcenter.receptionapi.dto.user.*;
+import com.medicalcenter.receptionapi.dto.user.AuthResponseDto;
+import com.medicalcenter.receptionapi.dto.user.RegisterRequestDto;
+import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
+import com.medicalcenter.receptionapi.dto.user.UserDetailsDto;
 import com.medicalcenter.receptionapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import javafx.util.Pair;

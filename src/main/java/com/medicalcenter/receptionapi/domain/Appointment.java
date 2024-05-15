@@ -1,17 +1,18 @@
 package com.medicalcenter.receptionapi.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "appointment")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Appointment {
 
     @Id
@@ -30,6 +31,12 @@ public class Appointment {
 
     @Column(name = "diagnosis")
     private String diagnosis;
+
+    @Column(name = "symptoms")
+    private String symptoms;
+
+    @Column(name = "medical_recommendations")
+    private String medicalRecommendations;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "doctor_id")

@@ -1,22 +1,40 @@
 package com.medicalcenter.receptionapi.exception;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AppointmentDoctorConflictException.class)
+    public ResponseEntity<String> handleAppointmentDoctorConflictExceptionException(AppointmentDoctorConflictException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(AppointmentPatientConflictException.class)
+    public ResponseEntity<String> handleAppointmentPatientConflictExceptionException(AppointmentPatientConflictException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidAppointmentTimeException.class)
+    public ResponseEntity<String> handleInvalidAppointmentTimeException(InvalidAppointmentTimeException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<String> handleBadCredentialsException() {
         return new ResponseEntity<>("Invalid username or password", HttpStatus.UNAUTHORIZED);
     }
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException() {
-        return new ResponseEntity<>("Resource not found", HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> handleResourceNotFoundException(ResourceNotFoundException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)

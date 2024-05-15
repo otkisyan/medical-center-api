@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.config;
 
-import com.medicalcenter.receptionapi.security.JwtAuthEntryPoint;
 import com.medicalcenter.receptionapi.security.JwtAuthenticationFilter;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
@@ -38,6 +37,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/doctors/**").hasAnyRole(RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
                         .requestMatchers("/offices").authenticated()
                         .requestMatchers("/work-schedules").authenticated()
+                        .requestMatchers("/appointments").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

@@ -22,7 +22,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private JwtTokenProvider jwtTokenProvider;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-    private final List<String> protectedUrls = List.of("/patients", "/doctors", "/offices", "/work-schedules");
+    private final List<String> protectedUrls = List.of(
+            "/patients",
+            "/doctors",
+            "/offices",
+            "/work-schedules",
+            "/appointments"
+    );
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
