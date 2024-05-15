@@ -2,13 +2,18 @@ package com.medicalcenter.receptionapi.service;
 
 import com.medicalcenter.receptionapi.domain.DayOfWeek;
 import com.medicalcenter.receptionapi.domain.Doctor;
+import com.medicalcenter.receptionapi.domain.Office;
 import com.medicalcenter.receptionapi.domain.WorkSchedule;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
+import com.medicalcenter.receptionapi.dto.office.OfficeResponseDto;
+import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleRequestDto;
 import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.exception.InvalidDoctorWorkTimeException;
+import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.DayOfWeekRepository;
 import com.medicalcenter.receptionapi.repository.WorkScheduleRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +33,19 @@ public class WorkScheduleService {
     public Page<WorkScheduleResponseDto> findWorkSchedulesByDoctorId(int page, int pageSize, Long doctorId){
         Pageable pageable = PageRequest.of(page, pageSize);
         return workScheduleRepository.findByDoctor_Id(doctorId, pageable).map(WorkScheduleResponseDto::ofEntity);
+    }
+
+    public WorkScheduleResponseDto updateWorkSchedule(WorkScheduleRequestDto workScheduleRequestDto, Long id){
+        WorkSchedule workScheduleToUpdate = workScheduleRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        if (workScheduleRequestDto.getWorkTimeStart() != null && workScheduleRequestDto.getWorkTimeEnd() != null) {
+            if (workScheduleRequestDto.getWorkTimeStart().isAfter(workScheduleRequestDto.getWorkTimeEnd())) {
+                throw new InvalidDoctorWorkTimeException();
+            }
+        }
+        WorkSchedule updateRequestWorkSchedule = WorkScheduleRequestDto.toEntity(workScheduleRequestDto);
+        BeanUtils.copyProperties(updateRequestWorkSchedule, workScheduleToUpdate, "id", "doctor", "dayOfWeek");
+        WorkSchedule updatedWorkSchedule = workScheduleRepository.save(workScheduleToUpdate);
+        return WorkScheduleResponseDto.ofEntity(updatedWorkSchedule);
     }
 
     public void saveAll(List<WorkSchedule> workSchedules) {

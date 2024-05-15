@@ -37,6 +37,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/patients/**").authenticated()
                         .requestMatchers("/doctors/**").hasAnyRole(RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
                         .requestMatchers("/offices").authenticated()
+                        .requestMatchers("/work-schedules").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )

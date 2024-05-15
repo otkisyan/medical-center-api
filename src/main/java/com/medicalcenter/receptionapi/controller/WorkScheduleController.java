@@ -5,6 +5,7 @@ import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleRequestDto;
 import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.service.WorkScheduleService;
 import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,9 +17,10 @@ public class WorkScheduleController {
 
     private final WorkScheduleService workScheduleService;
 
-    @PutMapping()
-    public String updateWorkSchedules(@RequestBody List<WorkScheduleRequestDto> workScheduleRequestDto) {
-
-        return "ok";
+    @PutMapping("/{id}")
+    public ResponseEntity<WorkScheduleResponseDto> updateWorkSchedule(@RequestBody WorkScheduleRequestDto workScheduleRequestDto,
+                                                                      @PathVariable("id") Long id) {
+        WorkScheduleResponseDto workScheduleResponseDto = workScheduleService.updateWorkSchedule(workScheduleRequestDto, id);
+        return ResponseEntity.ok(workScheduleResponseDto);
     }
 }
