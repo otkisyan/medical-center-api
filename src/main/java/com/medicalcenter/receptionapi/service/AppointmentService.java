@@ -13,6 +13,7 @@ import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.AppointmentSpecification;
 import com.medicalcenter.receptionapi.util.BeanCopyUtils;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -31,6 +33,7 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Validated
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final WorkScheduleService workScheduleService;
@@ -109,7 +112,7 @@ public class AppointmentService {
         return timeSlots;
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'RECEPTIONIST') or #appointmentRequestDto.doctorId == authentication.principal.id")
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #appointmentRequestDto.doctorId == authentication.principal.id")
     public AppointmentResponseDto saveAppointment(AppointmentRequestDto appointmentRequestDto) {
         Doctor doctor = doctorRepository.findById(appointmentRequestDto.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("A doctor with that id doesn't exist"));

@@ -3,6 +3,7 @@ package com.medicalcenter.receptionapi.controller;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentRequestDto;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentResponseDto;
 import com.medicalcenter.receptionapi.service.AppointmentService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,7 @@ public class AppointmentController {
     }
 
     @PostMapping()
-    public @ResponseBody ResponseEntity<AppointmentResponseDto> saveAppointment(@RequestBody AppointmentRequestDto appointmentRequestDto) {
+    public @ResponseBody ResponseEntity<AppointmentResponseDto> saveAppointment(@RequestBody @Valid AppointmentRequestDto appointmentRequestDto) {
         AppointmentResponseDto appointmentResponseDto = appointmentService.saveAppointment(appointmentRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
