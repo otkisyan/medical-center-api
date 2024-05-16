@@ -15,7 +15,7 @@ import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-@Controller
+@RestController
 @AllArgsConstructor
 @RequestMapping("/appointments")
 public class AppointmentController {

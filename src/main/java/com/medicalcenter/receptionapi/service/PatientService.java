@@ -63,13 +63,7 @@ public class PatientService {
     }
 
     public PatientResponseDto savePatient(PatientRequestDto patientRequestDto) {
-        Patient patient;
-        try {
-            patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
-        }
-        catch (Exception ex){
-            throw new IllegalArgumentException(ex.getMessage());
-        }
+        Patient patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
         return PatientResponseDto.ofEntity(patient);
     }
 

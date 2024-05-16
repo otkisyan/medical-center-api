@@ -3,6 +3,9 @@ package com.medicalcenter.receptionapi.controller;
 import com.medicalcenter.receptionapi.dto.patient.PatientRequestDto;
 import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.service.PatientService;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -25,14 +28,13 @@ public class PatientController {
             @RequestParam(name = "surname", required = false) String surname,
             @RequestParam(name = "middleName", required = false) String middleName,
             @RequestParam(name = "birthDate", required = false) LocalDate birthDate,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
+            @RequestParam(name = "page", defaultValue = "0") @Max(20)Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "5") @Max(value = 10) Integer pageSize) {
         Page<PatientResponseDto> patientsPage =
                 patientService.findAllPatients(surname, name, middleName, birthDate, page, pageSize);
         return ResponseEntity
                 .ok()
                 .body(patientsPage);
-
     }
 
     @GetMapping("/{id}")
