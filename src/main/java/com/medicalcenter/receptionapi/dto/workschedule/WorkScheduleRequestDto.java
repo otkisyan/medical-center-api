@@ -16,9 +16,7 @@ import java.time.LocalTime;
 public class WorkScheduleRequestDto {
     private Long doctorId;
     private Long dayOfWeekId;
-    @NotNull
     private LocalTime workTimeStart;
-    @NotNull
     private LocalTime workTimeEnd;
 
     public static WorkSchedule toEntity(WorkScheduleRequestDto workScheduleRequestDto){

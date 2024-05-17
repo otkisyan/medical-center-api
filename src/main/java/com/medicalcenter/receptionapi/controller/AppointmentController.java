@@ -2,6 +2,7 @@ package com.medicalcenter.receptionapi.controller;
 
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentRequestDto;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentResponseDto;
+import com.medicalcenter.receptionapi.dto.appointment.TimeSlotDto;
 import com.medicalcenter.receptionapi.service.AppointmentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -34,6 +36,14 @@ public class AppointmentController {
         Page<AppointmentResponseDto> appointmentsPage =
                 appointmentService.findAllAppointments(patient, doctor, date, timeStart, page, pageSize);
         return ResponseEntity.ok().body(appointmentsPage);
+    }
+
+
+    @GetMapping("/timetable/{id}")
+    public ResponseEntity<List<TimeSlotDto>> getTimeTable(@PathVariable("id") Long doctorId,
+                                                          @RequestParam(name = "date") LocalDate date) {
+        List<TimeSlotDto> timeSlots = appointmentService.generateTimetable(doctorId, date);
+        return ResponseEntity.ok(timeSlots);
     }
 
     @GetMapping("/{id}")

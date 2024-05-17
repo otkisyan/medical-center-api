@@ -11,6 +11,7 @@ import com.medicalcenter.receptionapi.exception.*;
 import com.medicalcenter.receptionapi.repository.AppointmentRepository;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
+import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.AppointmentSpecification;
 import com.medicalcenter.receptionapi.util.BeanCopyUtils;
 import jakarta.validation.Valid;
@@ -79,7 +80,6 @@ public class AppointmentService {
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
     public List<TimeSlotDto> generateTimetable(Long doctorId, LocalDate date) {
-        List<TimeSlotDto> timeSlots = new ArrayList<>();
         java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
         WorkSchedule workSchedule = workScheduleService.findWorkScheduleByDoctorAndDayOfWeek(doctorId, dayOfWeek.getValue());
         LocalTime workTimeStart = workSchedule.getWorkTimeStart();
@@ -87,6 +87,7 @@ public class AppointmentService {
         if (workTimeStart == null || workTimeEnd == null) {
             throw new WorkScheduleDoesNotExistException();
         }
+        List<TimeSlotDto> timeSlots = new ArrayList<>();
         List<Appointment> appointments = findAppointmentsByDoctorAndDate(doctorId, date);
         LocalTime currentTime = workTimeStart;
         while (currentTime.isBefore(workTimeEnd)) {
@@ -189,13 +190,11 @@ public class AppointmentService {
             throw new InvalidAppointmentTimeException();
         }
         Appointment appointmentToUpdate = appointmentRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-
         if (appointmentRequestDto.getDiagnosis() != null || appointmentRequestDto.getMedicalRecommendations() != null) {
-            if (userService.hasAnyAuthority("ROLE_RECEPTIONIST", "ROLE_ADMIN")) {
+            if (userService.hasAnyAuthority(RoleAuthority.RECEPTIONIST.authority, RoleAuthority.ADMIN.authority)) {
                 throw new AccessDeniedException("Access denied");
             }
         }
-
         Appointment appointmentUpdateRequest = AppointmentRequestDto.toEntity(appointmentRequestDto);
         appointmentUpdateRequest.setDoctor(doctor);
         BeanCopyUtils.copyNonNullProperties(appointmentUpdateRequest, appointmentToUpdate, "id", "patient");

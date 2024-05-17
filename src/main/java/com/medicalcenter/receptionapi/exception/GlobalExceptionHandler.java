@@ -149,6 +149,12 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler(WorkScheduleDoesNotExistException.class)
+    public ResponseEntity<ErrorResponse> handleWorkScheduleDoesNotExistException(WorkScheduleDoesNotExistException ex,
+                                                                         HttpServletRequest request) {
+        return buildErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, request);
+    }
+
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleUsernameNotFoundException(UsernameNotFoundException ex,
                                                                          HttpServletRequest request) {

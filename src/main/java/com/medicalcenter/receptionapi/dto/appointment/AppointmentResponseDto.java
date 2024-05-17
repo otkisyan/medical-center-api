@@ -1,5 +1,6 @@
 package com.medicalcenter.receptionapi.dto.appointment;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.medicalcenter.receptionapi.domain.Appointment;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
@@ -24,7 +25,9 @@ public class AppointmentResponseDto implements Serializable {
     private String diagnosis;
     private String symptoms;
     private String medicalRecommendations;
+    @JsonProperty("doctor")
     private DoctorResponseDto doctorResponseDto;
+    @JsonProperty("patient")
     private PatientResponseDto patientResponseDto;
 
     public static AppointmentResponseDto ofEntity(Appointment appointment) {
