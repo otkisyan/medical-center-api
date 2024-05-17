@@ -5,6 +5,8 @@ import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseWithUserCredentialsDto;
 import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.service.DoctorService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -30,11 +32,11 @@ public class DoctorController {
             @RequestParam(name = "birthDate", required = false) LocalDate birthDate,
             @RequestParam(name = "medicalSpecialty", required = false) String medicalSpecialty,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
-            Page<DoctorResponseDto> doctorsPage = doctorService.findAllDoctors(surname, name, middleName, birthDate, medicalSpecialty, page, pageSize);
-            return ResponseEntity
-                    .ok()
-                    .body(doctorsPage);
+            @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
+        Page<DoctorResponseDto> doctorsPage = doctorService.findAllDoctors(surname, name, middleName, birthDate, medicalSpecialty, page, pageSize);
+        return ResponseEntity
+                .ok()
+                .body(doctorsPage);
 
     }
 
@@ -42,8 +44,8 @@ public class DoctorController {
     public ResponseEntity<Page<WorkScheduleResponseDto>> findDoctorWorkSchedules(
             @PathVariable("id") Long id,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "7") Integer pageSize
-    ){
+            @RequestParam(name = "pageSize", defaultValue = "7") @Max(10) Integer pageSize
+    ) {
         Page<WorkScheduleResponseDto> workScheduleResponseDtoList = doctorService.findDoctorWorkSchedules(page, pageSize, id);
         return ResponseEntity.ok(workScheduleResponseDtoList);
     }
@@ -56,7 +58,7 @@ public class DoctorController {
     }
 
     @PostMapping()
-    public @ResponseBody ResponseEntity<DoctorResponseWithUserCredentialsDto> saveDoctor(@RequestBody DoctorRequestDto doctorRequestDto) {
+    public @ResponseBody ResponseEntity<DoctorResponseWithUserCredentialsDto> saveDoctor(@RequestBody @Valid DoctorRequestDto doctorRequestDto) {
         DoctorResponseWithUserCredentialsDto doctorResponseWithUserCredentialsDto = doctorService.saveDoctor(doctorRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -68,7 +70,7 @@ public class DoctorController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<DoctorResponseDto> updateDoctor(@RequestBody DoctorRequestDto doctorRequestDto, @PathVariable("id") Long id) {
+    public ResponseEntity<DoctorResponseDto> updateDoctor(@RequestBody @Valid DoctorRequestDto doctorRequestDto, @PathVariable("id") Long id) {
         DoctorResponseDto doctorResponseDto = doctorService.updateDoctor(doctorRequestDto, id);
         return ResponseEntity.ok()
                 .body(doctorResponseDto);
@@ -81,7 +83,7 @@ public class DoctorController {
     }
 
     @GetMapping("/count")
-    public long countDoctors(){
+    public long countDoctors() {
         return doctorService.count();
     }
 }

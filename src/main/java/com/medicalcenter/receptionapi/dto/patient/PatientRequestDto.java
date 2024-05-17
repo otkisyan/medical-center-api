@@ -1,6 +1,7 @@
 package com.medicalcenter.receptionapi.dto.patient;
 
 import com.medicalcenter.receptionapi.domain.Patient;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,12 +14,18 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class PatientRequestDto {
+    @NotNull
     private String name;
+    @NotNull
     private String surname;
+    @NotNull
     private String middleName;
+    @NotNull
     private String address;
+    @NotNull
     private String phone;
     private String messengerContact;
+    @NotNull
     private LocalDate birthDate;
     private String preferentialCategory;
 

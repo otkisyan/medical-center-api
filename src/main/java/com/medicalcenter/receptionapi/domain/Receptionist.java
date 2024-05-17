@@ -1,13 +1,17 @@
 package com.medicalcenter.receptionapi.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.LocalDate;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "receptionist")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class Receptionist {
     @Id
     @Column(name = "user_id", nullable = false)
@@ -21,6 +25,9 @@ public class Receptionist {
 
     @Column(name = "middle_name", nullable = false)
     private String middleName;
+
+    @Column(name = "birth_date", nullable = false)
+    private LocalDate birthDate;
 
     @OneToOne(cascade = CascadeType.REMOVE)
     @MapsId

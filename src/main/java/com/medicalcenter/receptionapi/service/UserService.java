@@ -15,6 +15,7 @@ import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.JwtTokenProvider;
 import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
+import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import jakarta.servlet.http.HttpServletRequest;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
@@ -58,7 +59,7 @@ public class UserService {
             throw new UserAlreadyExistsException("user: " + registerRequestDto.getUserCredentialsDto().getUsername() + " already exists");
         }
         String passwordHash = encoder.encode(registerRequestDto.getUserCredentialsDto().getPassword());
-        Role role = roleRepository.findByName(registerRequestDto.getRole().authority);
+        Role role = roleRepository.findByName(RoleAuthority.ADMIN.authority);
         User user = User.builder()
                 .username(registerRequestDto.getUserCredentialsDto().getUsername())
                 .password(passwordHash)

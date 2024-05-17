@@ -6,6 +6,7 @@ import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
 import com.medicalcenter.receptionapi.dto.user.UserDetailsDto;
 import com.medicalcenter.receptionapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody UserCredentialsDto userCredentialsDto) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid UserCredentialsDto userCredentialsDto) {
         Pair<ResponseCookie, AuthResponseDto> responsePair = userService.authUser(userCredentialsDto);
         return ResponseEntity
                 .ok()

@@ -3,6 +3,8 @@ package com.medicalcenter.receptionapi.controller;
 import com.medicalcenter.receptionapi.dto.office.OfficeRequestDto;
 import com.medicalcenter.receptionapi.dto.office.OfficeResponseDto;
 import com.medicalcenter.receptionapi.service.OfficeService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ public class OfficeController {
             @RequestParam(name = "name", required = false) String name,
             @RequestParam(name = "number", required = false) Integer number,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
+            @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
         Page<OfficeResponseDto> officesPage = officeService.findAllOffices(name, number, page, pageSize);
         return ResponseEntity.ok().body(officesPage);
     }
@@ -35,7 +37,7 @@ public class OfficeController {
     }
 
     @PostMapping()
-    public ResponseEntity<OfficeResponseDto> saveOffice(@RequestBody OfficeRequestDto officeRequestDto) {
+    public ResponseEntity<OfficeResponseDto> saveOffice(@RequestBody @Valid OfficeRequestDto officeRequestDto) {
         OfficeResponseDto officeResponseDto = officeService.saveOffice(officeRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -46,7 +48,7 @@ public class OfficeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OfficeResponseDto> updateOffice(@RequestBody OfficeRequestDto officeRequestDto, @PathVariable("id") Long id) {
+    public ResponseEntity<OfficeResponseDto> updateOffice(@RequestBody @Valid OfficeRequestDto officeRequestDto, @PathVariable("id") Long id) {
         OfficeResponseDto officeResponseDto = officeService.updateOffice(officeRequestDto, id);
         return ResponseEntity.ok().body(officeResponseDto);
     }

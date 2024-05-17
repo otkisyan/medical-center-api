@@ -1,6 +1,7 @@
 package com.medicalcenter.receptionapi.dto.workschedule;
 
 import com.medicalcenter.receptionapi.domain.WorkSchedule;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,9 @@ import java.time.LocalTime;
 public class WorkScheduleRequestDto {
     private Long doctorId;
     private Long dayOfWeekId;
+    @NotNull
     private LocalTime workTimeStart;
+    @NotNull
     private LocalTime workTimeEnd;
 
     public static WorkSchedule toEntity(WorkScheduleRequestDto workScheduleRequestDto){

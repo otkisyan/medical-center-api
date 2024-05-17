@@ -33,6 +33,7 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
                 //exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests((requests) -> requests
+                        .requestMatchers("/receptionists/**").hasAnyRole(RoleAuthority.ADMIN.toString())
                         .requestMatchers("/patients/**").authenticated()
                         .requestMatchers("/doctors/**").hasAnyRole(RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
                         .requestMatchers("/offices").authenticated()

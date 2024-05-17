@@ -3,9 +3,10 @@ package com.medicalcenter.receptionapi.controller;
 import com.medicalcenter.receptionapi.dto.patient.PatientRequestDto;
 import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.service.PatientService;
-import jakarta.validation.constraints.Email;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -28,8 +29,8 @@ public class PatientController {
             @RequestParam(name = "surname", required = false) String surname,
             @RequestParam(name = "middleName", required = false) String middleName,
             @RequestParam(name = "birthDate", required = false) LocalDate birthDate,
-            @RequestParam(name = "page", defaultValue = "0") @Max(20)Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "5") @Max(value = 10) Integer pageSize) {
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
         Page<PatientResponseDto> patientsPage =
                 patientService.findAllPatients(surname, name, middleName, birthDate, page, pageSize);
         return ResponseEntity
@@ -45,7 +46,7 @@ public class PatientController {
     }
 
     @PostMapping()
-    public @ResponseBody ResponseEntity<PatientResponseDto> savePatient(@RequestBody PatientRequestDto patientRequestDto) {
+    public @ResponseBody ResponseEntity<PatientResponseDto> savePatient(@RequestBody @Valid PatientRequestDto patientRequestDto) {
         PatientResponseDto patientResponseDto = patientService.savePatient(patientRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -57,7 +58,7 @@ public class PatientController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PatientResponseDto> updatePatient(@RequestBody PatientRequestDto patientRequestDto, @PathVariable("id") Long id) {
+    public ResponseEntity<PatientResponseDto> updatePatient(@RequestBody @Valid PatientRequestDto patientRequestDto, @PathVariable("id") Long id) {
         PatientResponseDto patientResponseDto = patientService.updatePatient(patientRequestDto, id);
         return ResponseEntity.ok()
                 .body(patientResponseDto);

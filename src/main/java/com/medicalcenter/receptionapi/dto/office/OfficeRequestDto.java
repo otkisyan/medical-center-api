@@ -1,6 +1,7 @@
 package com.medicalcenter.receptionapi.dto.office;
 
 import com.medicalcenter.receptionapi.domain.Office;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OfficeRequestDto {
 
+    @NotNull
     private Integer number;
+    @NotNull
     private String name;
 
     public static Office toEntity(OfficeRequestDto officeRequestDto) {

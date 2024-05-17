@@ -4,6 +4,7 @@ import com.medicalcenter.receptionapi.dto.appointment.AppointmentRequestDto;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentResponseDto;
 import com.medicalcenter.receptionapi.service.AppointmentService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +30,7 @@ public class AppointmentController {
             @RequestParam(name = "date", required = false) LocalDate date,
             @RequestParam(name = "timeStart", required = false) LocalTime timeStart,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
-            @RequestParam(name = "pageSize", defaultValue = "5") Integer pageSize) {
+            @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
         Page<AppointmentResponseDto> appointmentsPage =
                 appointmentService.findAllAppointments(patient, doctor, date, timeStart, page, pageSize);
         return ResponseEntity.ok().body(appointmentsPage);
