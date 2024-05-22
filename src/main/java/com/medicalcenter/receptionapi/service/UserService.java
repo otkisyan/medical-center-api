@@ -31,13 +31,14 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Random;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 public class UserService {
     private final BCryptPasswordEncoder encoder;
     private final AuthenticationManager authenticationManager;
@@ -59,7 +60,7 @@ public class UserService {
             throw new UserAlreadyExistsException("user: " + registerRequestDto.getUserCredentialsDto().getUsername() + " already exists");
         }
         String passwordHash = encoder.encode(registerRequestDto.getUserCredentialsDto().getPassword());
-        Role role = roleRepository.findByName(RoleAuthority.ADMIN.authority);
+        Role role = roleRepository.findByName(registerRequestDto.getRole().authority);
         User user = User.builder()
                 .username(registerRequestDto.getUserCredentialsDto().getUsername())
                 .password(passwordHash)
@@ -125,7 +126,8 @@ public class UserService {
         return new Pair<>(refreshTokenCookie, authResponseDto);
     }
 
-    public void logout(HttpServletRequest request) {
+
+    public ResponseCookie logout(HttpServletRequest request) {
         String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
         if (refreshToken == null) {
             refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
@@ -134,6 +136,7 @@ public class UserService {
             RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
             refreshSessionRepository.delete(refreshSession);
         }
+        return createEmptyRefreshTokenCookie();
     }
 
     public boolean validateRefreshToken(HttpServletRequest request) {
@@ -204,6 +207,16 @@ public class UserService {
                 .secure(true)
                 .path(SecurityConstants.REFRESH_TOKEN_COOKIE_PATH)
                 .maxAge(expiresInSec)
+                .sameSite("None")
+                .build();
+    }
+
+    private ResponseCookie createEmptyRefreshTokenCookie(){
+        return ResponseCookie.from(SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, "")
+                .httpOnly(true)
+                .secure(true)
+                .path(SecurityConstants.REFRESH_TOKEN_COOKIE_PATH)
+                .maxAge(0)
                 .sameSite("None")
                 .build();
     }

@@ -120,7 +120,7 @@ public class AppointmentService {
         Patient patient = patientRepository.findById(appointmentRequestDto.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("A patient with that id doesn't exist"));
         if (!appointmentRequestDto.getTimeStart().isBefore(appointmentRequestDto.getTimeEnd())) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("The start time of the appointment cannot be greater than the end time");
         }
         if (appointmentRepository.existsByPatient_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqual(
                 appointmentRequestDto.getPatientId(),

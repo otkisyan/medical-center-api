@@ -33,11 +33,11 @@ public class AppointmentController {
             @RequestParam(name = "timeStart", required = false) LocalTime timeStart,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
+
         Page<AppointmentResponseDto> appointmentsPage =
                 appointmentService.findAllAppointments(patient, doctor, date, timeStart, page, pageSize);
         return ResponseEntity.ok().body(appointmentsPage);
     }
-
 
     @GetMapping("/timetable/{id}")
     public ResponseEntity<List<TimeSlotDto>> getTimeTable(@PathVariable("id") Long doctorId,
@@ -53,7 +53,8 @@ public class AppointmentController {
     }
 
     @PostMapping()
-    public @ResponseBody ResponseEntity<AppointmentResponseDto> saveAppointment(@RequestBody @Valid AppointmentRequestDto appointmentRequestDto) {
+    public @ResponseBody ResponseEntity<AppointmentResponseDto> saveAppointment(
+            @RequestBody @Valid AppointmentRequestDto appointmentRequestDto) {
         AppointmentResponseDto appointmentResponseDto = appointmentService.saveAppointment(appointmentRequestDto);
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -65,7 +66,9 @@ public class AppointmentController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AppointmentResponseDto> updateAppointment(@RequestBody AppointmentRequestDto appointmentRequestDto, @PathVariable("id") Long id) {
+    public ResponseEntity<AppointmentResponseDto> updateAppointment(
+            @RequestBody AppointmentRequestDto appointmentRequestDto,
+            @PathVariable("id") Long id) {
         appointmentService.updateAppointment(appointmentRequestDto, id);
         return ResponseEntity.ok()
                 .build();

@@ -52,7 +52,7 @@ public class UserController {
         if(userDetailsDto != null){
             return ResponseEntity.ok(userDetailsDto);
         }
-        else{
+        else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
@@ -62,15 +62,18 @@ public class UserController {
         if (userService.validateRefreshToken(request)) {
             return ResponseEntity.ok(true);
         }
-        else{
+        else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
         }
     }
 
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request){
-        userService.logout(request);
-        return ResponseEntity.ok("Logout successful");
+        ResponseCookie emptyRefreshTokenCookie = userService.logout(request);
+        return ResponseEntity
+                .ok()
+                .header(HttpHeaders.SET_COOKIE, emptyRefreshTokenCookie.toString())
+                .body("Logout successful");
     }
 }
 

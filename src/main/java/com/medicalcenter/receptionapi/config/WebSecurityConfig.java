@@ -5,6 +5,8 @@ import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Role;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,8 +27,6 @@ import java.util.List;
 @AllArgsConstructor
 public class WebSecurityConfig {
 
-    // private final JwtAuthEntryPoint jwtAuthEntryPoint;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -35,6 +35,17 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/receptionists/**").hasAnyRole(RoleAuthority.ADMIN.toString())
                         .requestMatchers("/patients/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/doctors").hasAnyRole(RoleAuthority.ADMIN.toString())
+                        .requestMatchers(HttpMethod.POST, "/doctors").hasAnyRole(RoleAuthority.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PUT, "/doctors").hasAnyRole(RoleAuthority.ADMIN.toString())
+                        .requestMatchers(HttpMethod.GET, "/doctors").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString())
+                        .requestMatchers(HttpMethod.GET, "/doctors/**").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString(),
+                                RoleAuthority.DOCTOR.toString()
+                        )
                         .requestMatchers("/doctors/**").hasAnyRole(RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
                         .requestMatchers("/offices").authenticated()
                         .requestMatchers("/work-schedules").authenticated()

@@ -23,6 +23,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -76,6 +77,7 @@ public class DoctorService {
         return doctorRepository.findAll(specs, pageable).map(DoctorResponseDto::ofEntity);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #id == authentication.principal.id")
     public DoctorResponseDto findDoctorById(Long id) {
         return doctorRepository.findById(id).map(DoctorResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }
