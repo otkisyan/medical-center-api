@@ -16,8 +16,9 @@ public class WorkScheduleController {
     private final WorkScheduleService workScheduleService;
 
     @PutMapping("/{id}")
-    public ResponseEntity<WorkScheduleResponseDto> updateWorkSchedule(@RequestBody @Valid WorkScheduleRequestDto workScheduleRequestDto,
-                                                                      @PathVariable("id") Long id) {
+    public ResponseEntity<WorkScheduleResponseDto> updateWorkSchedule(
+            @RequestBody @Valid WorkScheduleRequestDto workScheduleRequestDto,
+            @PathVariable("id") Long id) {
         WorkScheduleResponseDto workScheduleResponseDto = workScheduleService.updateWorkSchedule(workScheduleRequestDto, id);
         return ResponseEntity.ok(workScheduleResponseDto);
     }

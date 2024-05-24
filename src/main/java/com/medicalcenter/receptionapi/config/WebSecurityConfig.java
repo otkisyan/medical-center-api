@@ -31,13 +31,18 @@ public class WebSecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-                //exceptionHandling((exception) -> exception.authenticationEntryPoint(jwtAuthEntryPoint))
                 .authorizeHttpRequests((requests) -> requests
+                        // Receptionists
                         .requestMatchers("/receptionists/**").hasAnyRole(RoleAuthority.ADMIN.toString())
-                        .requestMatchers("/patients/**").authenticated()
+                        // Patients
+                        .requestMatchers("/patients/**").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString(),
+                                RoleAuthority.DOCTOR.toString())
+                        // Doctors
                         .requestMatchers(HttpMethod.DELETE, "/doctors").hasAnyRole(RoleAuthority.ADMIN.toString())
                         .requestMatchers(HttpMethod.POST, "/doctors").hasAnyRole(RoleAuthority.ADMIN.toString())
-                        .requestMatchers(HttpMethod.PUT, "/doctors").hasAnyRole(RoleAuthority.ADMIN.toString())
+                        .requestMatchers(HttpMethod.PUT, "/doctors/**").hasAnyRole(RoleAuthority.ADMIN.toString())
                         .requestMatchers(HttpMethod.GET, "/doctors").hasAnyRole(
                                 RoleAuthority.ADMIN.toString(),
                                 RoleAuthority.RECEPTIONIST.toString())
@@ -46,11 +51,31 @@ public class WebSecurityConfig {
                                 RoleAuthority.RECEPTIONIST.toString(),
                                 RoleAuthority.DOCTOR.toString()
                         )
-                        .requestMatchers("/doctors/**").hasAnyRole(RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
-                        .requestMatchers("/offices").authenticated()
-                        .requestMatchers("/work-schedules").authenticated()
-                        .requestMatchers("/appointments").authenticated()
-                        .requestMatchers("/auth/**").permitAll()
+                        // Offices
+                        .requestMatchers(HttpMethod.GET,"/offices/**").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString(),
+                                RoleAuthority.DOCTOR.toString())
+                        .requestMatchers(HttpMethod.POST,"/offices").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString())
+                        .requestMatchers(HttpMethod.PUT,"/offices").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString())
+                        .requestMatchers(HttpMethod.DELETE,"/offices").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString())
+                        // Work Schedules
+                        .requestMatchers("/work-schedules/**").hasAnyRole(
+                                RoleAuthority.RECEPTIONIST.toString(),
+                                RoleAuthority.ADMIN.toString())
+                        // Appointments
+                        .requestMatchers("/appointments/**").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString(),
+                                RoleAuthority.DOCTOR.toString())
+                        // User
+                        .requestMatchers("/user/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -190,7 +190,9 @@ public class AppointmentService {
             throw new InvalidAppointmentTimeException();
         }
         Appointment appointmentToUpdate = appointmentRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        if (appointmentRequestDto.getDiagnosis() != null || appointmentRequestDto.getMedicalRecommendations() != null) {
+        if (appointmentRequestDto.getDiagnosis() != null
+                || appointmentRequestDto.getMedicalRecommendations() != null
+                || appointmentRequestDto.getSymptoms() != null) {
             if (userService.hasAnyAuthority(RoleAuthority.RECEPTIONIST.authority, RoleAuthority.ADMIN.authority)) {
                 throw new AccessDeniedException("Access denied");
             }
