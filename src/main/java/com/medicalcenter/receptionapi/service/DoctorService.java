@@ -18,6 +18,8 @@ import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,14 +42,18 @@ public class DoctorService {
     private final WorkScheduleService workScheduleService;
     private final UserService userService;
 
-    public long count() {
-        return doctorRepository.count();
-    }
 
     public List<Doctor> findAllDoctors() {
         return doctorRepository.findAll();
     }
 
+    @Cacheable(value = "doctors", key = "'count'")
+    public long count() {
+        return doctorRepository.count();
+    }
+
+    @Cacheable(value = "doctors", key = "#surname + '_' + #name + '_' + #middleName + '_'" +
+            "+ (#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + #medicalSpecialty + '_'  + #page + '_' + #pageSize")
     public Page<DoctorResponseDto> findAllDoctors(String name,
                                                   String surname,
                                                   String middleName,
@@ -78,15 +84,18 @@ public class DoctorService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #id == authentication.principal.id")
+    @Cacheable(value = "doctors", key = "#id")
     public DoctorResponseDto findDoctorById(Long id) {
         return doctorRepository.findById(id).map(DoctorResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
     public Page<WorkScheduleResponseDto> findDoctorWorkSchedules(int page, int pageSize, Long doctorId){
         findDoctorById(doctorId);
         return workScheduleService.findWorkSchedulesByDoctorId(page, pageSize, doctorId);
     }
 
+    @CacheEvict(value = "doctors", allEntries = true)
     public DoctorResponseWithUserCredentialsDto saveDoctor(DoctorRequestDto doctorRequestDto) {
         Doctor doctor = DoctorRequestDto.toEntity(doctorRequestDto);
         if(doctorRequestDto.getOfficeId() != null) {
@@ -114,6 +123,7 @@ public class DoctorService {
                 .build();
     }
 
+    @CacheEvict(value = "doctors", allEntries = true)
     public DoctorResponseDto updateDoctor(DoctorRequestDto doctorRequestDto, Long id) {
         Doctor doctorToUpdate = doctorRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         Doctor updateRequestDoctor = DoctorRequestDto.toEntity(doctorRequestDto);
@@ -132,7 +142,7 @@ public class DoctorService {
         return DoctorResponseDto.ofEntity(updatedDoctor);
     }
 
-
+    @CacheEvict(value = "doctors", allEntries = true)
     public void deleteDoctor(Long id) {
         doctorRepository.deleteById(id);
     }

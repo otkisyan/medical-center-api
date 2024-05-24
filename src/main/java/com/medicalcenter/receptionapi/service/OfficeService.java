@@ -9,6 +9,8 @@ import com.medicalcenter.receptionapi.repository.OfficeRepository;
 import com.medicalcenter.receptionapi.specification.OfficeSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +31,13 @@ public class OfficeService {
         return officeRepository.findAll();
     }
 
+    @Cacheable(value = "offices", key = "'count'")
+    public long count() {
+        return officeRepository.count();
+    }
+
+    @Cacheable(value = "offices", key = "#name + '_' + #number + '_'" +
+            "+ '_' + #page + '_' + #pageSize")
     public Page<OfficeResponseDto> findAllOffices(String name, Integer number, int page, int pageSize) {
 
         Specification<Office> specs = Specification.where(null);
@@ -43,15 +52,18 @@ public class OfficeService {
         return officeRepository.findAll(specs, pageable).map(OfficeResponseDto::ofEntity);
     }
 
+    @Cacheable(value = "offices", key = "#id")
     public OfficeResponseDto findOfficeById(Long id) {
         return officeRepository.findById(id).map(OfficeResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }
 
+    @CacheEvict(value = "offices", allEntries = true)
     public OfficeResponseDto saveOffice(OfficeRequestDto officeRequestDto) {
         Office office = officeRepository.save(OfficeRequestDto.toEntity(officeRequestDto));
         return OfficeResponseDto.ofEntity(office);
     }
 
+    @CacheEvict(value = "offices", allEntries = true)
     public OfficeResponseDto updateOffice(OfficeRequestDto officeRequestDto, Long id) {
         Office officeToUpdate = officeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         BeanUtils.copyProperties(officeRequestDto, officeToUpdate, "id", "doctors");
@@ -59,6 +71,7 @@ public class OfficeService {
         return OfficeResponseDto.ofEntity(office);
     }
 
+    @CacheEvict(value = "offices", allEntries = true)
     public void deleteOffice(Long id) {
         Office officeToDelete = officeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         Set<Doctor> officeDoctors = officeToDelete.getDoctors();
@@ -68,9 +81,5 @@ public class OfficeService {
             }
         }
         officeRepository.deleteById(id);
-    }
-
-    public long count() {
-        return officeRepository.count();
     }
 }

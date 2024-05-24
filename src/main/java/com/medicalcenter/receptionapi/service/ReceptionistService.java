@@ -15,6 +15,8 @@ import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.ReceptionistSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,13 @@ public class ReceptionistService {
         return receptionistRepository.findAll();
     }
 
+    @Cacheable(value = "receptionists", key = "'count'")
+    public long count() {
+        return receptionistRepository.count();
+    }
+
+    @Cacheable(value = "receptionists", key = "#surname + '_' + #name + '_' + #middleName + '_'" +
+            "+ (#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + '_'  + #page + '_' + #pageSize")
     public Page<ReceptionistResponseDto> findAllReceptionists(String name,
                                                               String surname,
                                                               String middleName,
@@ -62,10 +71,12 @@ public class ReceptionistService {
         return receptionistRepository.findAll(specs, pageable).map(ReceptionistResponseDto::ofEntity);
     }
 
+    @Cacheable(value = "receptionists", key = "#id")
     public ReceptionistResponseDto findReceptionistById(Long id) {
         return receptionistRepository.findById(id).map(ReceptionistResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }
 
+    @CacheEvict(value = "receptionists", allEntries = true)
     public ReceptionistResponseWithUserCredentialsDto saveReceptionist(ReceptionistRequestDto receptionistRequestDto) {
         Receptionist receptionist = ReceptionistRequestDto.toEntity(receptionistRequestDto);
         UserCredentialsDto userCredentialsDto = userService.generateRandomCredentials();
@@ -85,6 +96,7 @@ public class ReceptionistService {
                 .build();
     }
 
+    @CacheEvict(value = "receptionists", allEntries = true)
     public ReceptionistResponseDto updateReceptionist(ReceptionistRequestDto receptionistRequestDto, Long id) {
         Receptionist updateRequestReceptionist = ReceptionistRequestDto.toEntity(receptionistRequestDto);
         Receptionist receptionistToUpdate = receptionistRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
@@ -93,11 +105,8 @@ public class ReceptionistService {
         return ReceptionistResponseDto.ofEntity(updatedReceptionist);
     }
 
+    @CacheEvict(value = "receptionists", allEntries = true)
     public void deleteReceptionist(Long id) {
         receptionistRepository.deleteById(id);
-    }
-
-    public long count() {
-        return receptionistRepository.count();
     }
 }

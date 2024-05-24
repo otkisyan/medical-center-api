@@ -6,11 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DoctorResponseWithUserCredentialsDto {
+public class DoctorResponseWithUserCredentialsDto implements Serializable {
     private DoctorResponseDto doctorResponseDto;
     private UserCredentialsDto userCredentialsDto;
 }

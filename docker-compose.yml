@@ -1,0 +1,59 @@
+version: '3.9'
+services:
+  mariadb:
+    image: mariadb
+    container_name: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: $MARIADB_ROOT_PASSWORD
+      MARIADB_DATABASE: $MARIADB_DATABASE
+    ports:
+      - "3306:3306"
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_ARBITRARY=1
+    depends_on:
+      - mariadb
+  redis-2:
+    image: bitnami/redis:latest
+    container_name: redis-2
+    restart: always
+    environment:
+      REDIS_PASSWORD: $HOST_REDIS_PASSWORD
+      REDIS_PORT_NUMBER: 6380
+    ports:
+      - "6380:6380"
+  redisinsight-2:
+    restart: always
+    container_name: redisinsight-2
+    image: redis/redisinsight:latest
+    environment:
+      RI_APP_PORT: 5541
+    ports:
+      - "5541:5541"
+    depends_on:
+      - redis-2
+  app:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    volumes:
+      - /tmp
+    environment:
+      SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: $MARIADB_ROOT_PASSWORD
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mariadb
+      - phpmyadmin
+      - redis-2
+      - redisinsight-2

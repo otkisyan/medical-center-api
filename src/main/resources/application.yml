@@ -13,6 +13,15 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: validate
+  cache:
+    type: redis
+    redis:
+      time-to-live: 30m
+  data:
+    redis:
+      host: localhost
+      port: 6380
+      password: ${HOST_REDIS_PASSWORD}
 server:
   port: 8080
 security:

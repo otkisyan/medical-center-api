@@ -16,6 +16,8 @@ import com.medicalcenter.receptionapi.specification.AppointmentSpecification;
 import com.medicalcenter.receptionapi.util.BeanCopyUtils;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -46,14 +48,20 @@ public class AppointmentService {
         return appointmentRepository.findAll();
     }
 
+
+    @Cacheable(value = "appointments", key = "'count'")
+    public long count() {
+        return appointmentRepository.count();
+    }
+
     public List<Appointment> findAppointmentsByDoctorAndDate(Long doctorId, LocalDate date) {
         return appointmentRepository.findByDoctor_IdAndDate(doctorId, date);
     }
 
-    public AppointmentResponseDto findAppointmentById(Long id) {
-        return appointmentRepository.findById(id).map(AppointmentResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
-    }
-
+    @Cacheable(value = "appointments", key = "#patient + '_' + #doctor + '_'" +
+            "+ (#date != null ? #date.toString() : 'null') + '_'" +
+            "+ (#timeStart != null ? #timeStart.toString() : 'null')" +
+            "+ '_' + #page + '_' + #pageSize")
     public Page<AppointmentResponseDto> findAllAppointments(String patient,
                                                             String doctor,
                                                             LocalDate date,
@@ -78,6 +86,12 @@ public class AppointmentService {
         return appointmentRepository.findAll(specs, pageable).map(AppointmentResponseDto::ofEntity);
     }
 
+    @Cacheable(value = "appointments", key = "#id")
+    public AppointmentResponseDto findAppointmentById(Long id) {
+        return appointmentRepository.findById(id).map(AppointmentResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    @Cacheable(value = "timetable", key = "#doctorId + '_' + #date")
     @PreAuthorize("hasAnyAuthority('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
     public List<TimeSlotDto> generateTimetable(Long doctorId, LocalDate date) {
         java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
@@ -114,6 +128,7 @@ public class AppointmentService {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #appointmentRequestDto.doctorId == authentication.principal.id")
+    @CacheEvict(value = {"appointments", "timetable"}, allEntries = true)
     public AppointmentResponseDto saveAppointment(AppointmentRequestDto appointmentRequestDto) {
         Doctor doctor = doctorRepository.findById(appointmentRequestDto.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("A doctor with that id doesn't exist"));
@@ -156,7 +171,8 @@ public class AppointmentService {
     }
 
     @PreAuthorize("hasAnyAuthority('ADMIN', 'RECEPTIONIST') or #appointmentRequestDto.doctorId == authentication.principal.id")
-    public void updateAppointment(AppointmentRequestDto appointmentRequestDto, Long id) {
+    @CacheEvict(value = {"appointments", "timetable"}, allEntries = true)
+    public AppointmentResponseDto updateAppointment(AppointmentRequestDto appointmentRequestDto, Long id) {
         Doctor doctor = doctorRepository.findById(appointmentRequestDto.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("A doctor with that id doesn't exist"));
         if (!appointmentRequestDto.getTimeStart().isBefore(appointmentRequestDto.getTimeEnd())) {
@@ -200,14 +216,12 @@ public class AppointmentService {
         Appointment appointmentUpdateRequest = AppointmentRequestDto.toEntity(appointmentRequestDto);
         appointmentUpdateRequest.setDoctor(doctor);
         BeanCopyUtils.copyNonNullProperties(appointmentUpdateRequest, appointmentToUpdate, "id", "patient");
-        appointmentRepository.save(appointmentToUpdate);
+        Appointment updatedAppointment = appointmentRepository.save(appointmentToUpdate);
+        return AppointmentResponseDto.ofEntity(updatedAppointment);
     }
 
+    @CacheEvict(value = {"appointments", "timetable"}, allEntries = true)
     public void deleteAppointment(Long id) {
         appointmentRepository.deleteById(id);
-    }
-
-    public long count() {
-        return appointmentRepository.count();
     }
 }

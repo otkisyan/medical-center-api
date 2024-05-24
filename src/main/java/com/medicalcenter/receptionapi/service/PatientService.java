@@ -8,6 +8,8 @@ import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,14 +26,17 @@ public class PatientService {
 
     private final PatientRepository patientRepository;
 
-    public long count() {
-        return patientRepository.count();
-    }
-
     public List<Patient> findAllPatients() {
         return patientRepository.findAll();
     }
 
+    @Cacheable(value = "patients", key = "'count'")
+    public long count() {
+        return patientRepository.count();
+    }
+
+    @Cacheable(value = "patients", key = "#surname + '_' + #name + '_' + #middleName + '_' + " +
+            "(#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + #page + '_' + #pageSize")
     public Page<PatientResponseDto> findAllPatients(String surname,
                                                     String name,
                                                     String middleName,
@@ -57,16 +62,19 @@ public class PatientService {
         return patientRepository.findAll(specs, pageable).map(PatientResponseDto::ofEntity);
     }
 
+    @Cacheable(value = "patients", key = "#id")
     public PatientResponseDto findPatientById(Long id) {
         Patient patient = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         return PatientResponseDto.ofEntity(patient);
     }
 
+    @CacheEvict(value = "patients", allEntries = true)
     public PatientResponseDto savePatient(PatientRequestDto patientRequestDto) {
         Patient patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
         return PatientResponseDto.ofEntity(patient);
     }
 
+    @CacheEvict(value = "patients", allEntries = true)
     public PatientResponseDto updatePatient(PatientRequestDto patientRequestDto, Long id) {
         Patient patientToUpdate = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         BeanUtils.copyProperties(patientRequestDto, patientToUpdate, "id", "appointments");
@@ -79,6 +87,7 @@ public class PatientService {
         return PatientResponseDto.ofEntity(patient);
     }
 
+    @CacheEvict(value = "patients", allEntries = true)
     public void deletePatient(Long id) {
         patientRepository.deleteById(id);
     }

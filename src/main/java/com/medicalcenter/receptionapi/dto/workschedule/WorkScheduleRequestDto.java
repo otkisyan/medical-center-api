@@ -7,13 +7,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.LocalTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkScheduleRequestDto {
+public class WorkScheduleRequestDto implements Serializable {
     private Long doctorId;
     private Long dayOfWeekId;
     private LocalTime workTimeStart;
