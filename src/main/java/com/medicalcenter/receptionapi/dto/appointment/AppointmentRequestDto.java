@@ -24,9 +24,6 @@ public class AppointmentRequestDto implements Serializable {
     private LocalTime timeStart;
     @NotNull
     private LocalTime timeEnd;
-    private String diagnosis;
-    private String symptoms;
-    private String medicalRecommendations;
     @NotNull
     private Long patientId;
     @NotNull
@@ -35,9 +32,6 @@ public class AppointmentRequestDto implements Serializable {
     public static Appointment toEntity(AppointmentRequestDto appointmentRequestDto) {
         return Appointment.builder()
                 .date(appointmentRequestDto.getDate())
-                .diagnosis(appointmentRequestDto.getDiagnosis())
-                .symptoms(appointmentRequestDto.getSymptoms())
-                .medicalRecommendations(appointmentRequestDto.getMedicalRecommendations())
                 .timeStart(appointmentRequestDto.getTimeStart())
                 .timeEnd(appointmentRequestDto.getTimeEnd())
                 .build();

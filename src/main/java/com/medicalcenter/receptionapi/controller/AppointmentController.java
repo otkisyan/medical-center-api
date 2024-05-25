@@ -3,6 +3,7 @@ package com.medicalcenter.receptionapi.controller;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentRequestDto;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentResponseDto;
 import com.medicalcenter.receptionapi.dto.appointment.TimeSlotDto;
+import com.medicalcenter.receptionapi.dto.consultation.ConsultationResponseDto;
 import com.medicalcenter.receptionapi.service.AppointmentService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -44,6 +45,12 @@ public class AppointmentController {
                                                           @RequestParam(name = "date") LocalDate date) {
         List<TimeSlotDto> timeSlots = appointmentService.generateTimetable(doctorId, date);
         return ResponseEntity.ok(timeSlots);
+    }
+
+    @GetMapping("/{id}/consultation")
+    public ResponseEntity<ConsultationResponseDto> getAppointmentConsultation(@PathVariable("id") Long appointmentId) {
+        ConsultationResponseDto consultationResponseDto = appointmentService.getAppointmentConsultation(appointmentId);
+        return ResponseEntity.ok(consultationResponseDto);
     }
 
     @GetMapping("/{id}")

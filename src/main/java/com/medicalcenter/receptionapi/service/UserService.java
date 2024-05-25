@@ -4,10 +4,7 @@ import com.medicalcenter.receptionapi.domain.RefreshSession;
 import com.medicalcenter.receptionapi.domain.Role;
 import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.dto.user.*;
-import com.medicalcenter.receptionapi.exception.InvalidTokenException;
-import com.medicalcenter.receptionapi.exception.InvalidTokenTypeException;
-import com.medicalcenter.receptionapi.exception.RefreshTokenNotFoundException;
-import com.medicalcenter.receptionapi.exception.UserAlreadyExistsException;
+import com.medicalcenter.receptionapi.exception.*;
 import com.medicalcenter.receptionapi.repository.RefreshSessionRepository;
 import com.medicalcenter.receptionapi.repository.RoleRepository;
 import com.medicalcenter.receptionapi.repository.UserRepository;
@@ -35,6 +32,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Random;
 
 @Service
@@ -139,6 +137,20 @@ public class UserService {
         return createEmptyRefreshTokenCookie();
     }
 
+    public void changePassword(ChangePasswordRequestDto changePasswordRequestDto) {
+        CustomUserDetails customUserDetails = getCustomUserDetails();
+        User user = userRepository.findById(customUserDetails.getId()).orElseThrow(ResourceNotFoundException::new);
+        if (!encoder.matches(changePasswordRequestDto.getCurrentPassword(), user.getPassword())) {
+            throw new UserPasswordChangeException("The password provided does not match the real password");
+        }
+        if (!Objects.equals(changePasswordRequestDto.getConfirmPassword(), changePasswordRequestDto.getNewPassword())) {
+            throw new UserPasswordChangeException("The confirmation password does not match the new password");
+        }
+        String encryptedNewPassword = encoder.encode(changePasswordRequestDto.getNewPassword());
+        user.setPassword(encryptedNewPassword);
+        userRepository.save(user);
+    }
+
     public boolean validateRefreshToken(HttpServletRequest request) {
         String refreshToken = getRefreshToken(request);
         RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
@@ -156,6 +168,11 @@ public class UserService {
         String username = jwtTokenProvider.getUsernameFromJwt(refreshToken);
         CustomUserDetails customUserDetails = (CustomUserDetails) userDetailsService.loadUserByUsername(username);
         return UserDetailsDto.ofUserDetails(customUserDetails);
+    }
+
+    public CustomUserDetails getCustomUserDetails() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (CustomUserDetails) authentication.getPrincipal();
     }
 
     public String getRefreshToken(HttpServletRequest request) {

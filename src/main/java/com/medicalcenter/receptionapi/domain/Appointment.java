@@ -30,15 +30,6 @@ public class Appointment {
     @Column(name = "time_end", nullable = false)
     private LocalTime timeEnd;
 
-    @Column(name = "diagnosis")
-    private String diagnosis;
-
-    @Column(name = "symptoms")
-    private String symptoms;
-
-    @Column(name = "medical_recommendations")
-    private String medicalRecommendations;
-
     @ManyToOne(optional = false)
     @JoinColumn(name = "doctor_id")
     private Doctor doctor;

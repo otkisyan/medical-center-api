@@ -22,9 +22,6 @@ public class AppointmentResponseDto implements Serializable {
     private LocalDate date;
     private LocalTime timeStart;
     private LocalTime timeEnd;
-    private String diagnosis;
-    private String symptoms;
-    private String medicalRecommendations;
     @JsonProperty("doctor")
     private DoctorResponseDto doctorResponseDto;
     @JsonProperty("patient")
@@ -36,9 +33,6 @@ public class AppointmentResponseDto implements Serializable {
                 .date(appointment.getDate())
                 .timeStart(appointment.getTimeStart())
                 .timeEnd(appointment.getTimeEnd())
-                .diagnosis(appointment.getDiagnosis())
-                .symptoms(appointment.getSymptoms())
-                .medicalRecommendations(appointment.getMedicalRecommendations())
                 .patientResponseDto(PatientResponseDto.ofEntity(appointment.getPatient()))
                 .doctorResponseDto(DoctorResponseDto.ofEntity(appointment.getDoctor()))
                 .build();

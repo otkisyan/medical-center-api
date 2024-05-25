@@ -1,14 +1,13 @@
 package com.medicalcenter.receptionapi.service;
 
-import com.medicalcenter.receptionapi.domain.Appointment;
-import com.medicalcenter.receptionapi.domain.Doctor;
-import com.medicalcenter.receptionapi.domain.Patient;
-import com.medicalcenter.receptionapi.domain.WorkSchedule;
+import com.medicalcenter.receptionapi.domain.*;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentRequestDto;
 import com.medicalcenter.receptionapi.dto.appointment.AppointmentResponseDto;
 import com.medicalcenter.receptionapi.dto.appointment.TimeSlotDto;
+import com.medicalcenter.receptionapi.dto.consultation.ConsultationResponseDto;
 import com.medicalcenter.receptionapi.exception.*;
 import com.medicalcenter.receptionapi.repository.AppointmentRepository;
+import com.medicalcenter.receptionapi.repository.ConsultationRepository;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
@@ -36,13 +35,13 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-@Validated
 public class AppointmentService {
     private final AppointmentRepository appointmentRepository;
     private final WorkScheduleService workScheduleService;
     private final PatientRepository patientRepository;
-    private final UserService userService;
     private final DoctorRepository doctorRepository;
+    private final ConsultationRepository consultationRepository;
+    private ConsultationService consultationService;
 
     public List<Appointment> findAllAppointments() {
         return appointmentRepository.findAll();
@@ -89,6 +88,10 @@ public class AppointmentService {
     @Cacheable(value = "appointments", key = "#id")
     public AppointmentResponseDto findAppointmentById(Long id) {
         return appointmentRepository.findById(id).map(AppointmentResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
+    }
+
+    public ConsultationResponseDto getAppointmentConsultation(Long appointmentId){
+       return consultationService.findConsultationById(appointmentId);
     }
 
     @Cacheable(value = "timetable", key = "#doctorId + '_' + #date")
@@ -167,6 +170,9 @@ public class AppointmentService {
         newAppointment.setDoctor(doctor);
         newAppointment.setPatient(patient);
         newAppointment = appointmentRepository.save(newAppointment);
+        Consultation consultation = new Consultation();
+        consultation.setAppointment(newAppointment);
+        consultationRepository.save(consultation);
         return AppointmentResponseDto.ofEntity(newAppointment);
     }
 
@@ -206,13 +212,6 @@ public class AppointmentService {
             throw new InvalidAppointmentTimeException();
         }
         Appointment appointmentToUpdate = appointmentRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        if (appointmentRequestDto.getDiagnosis() != null
-                || appointmentRequestDto.getMedicalRecommendations() != null
-                || appointmentRequestDto.getSymptoms() != null) {
-            if (userService.hasAnyAuthority(RoleAuthority.RECEPTIONIST.authority, RoleAuthority.ADMIN.authority)) {
-                throw new AccessDeniedException("Access denied");
-            }
-        }
         Appointment appointmentUpdateRequest = AppointmentRequestDto.toEntity(appointmentRequestDto);
         appointmentUpdateRequest.setDoctor(doctor);
         BeanCopyUtils.copyNonNullProperties(appointmentUpdateRequest, appointmentToUpdate, "id", "patient");

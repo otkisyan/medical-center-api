@@ -1,9 +1,6 @@
 package com.medicalcenter.receptionapi.controller;
 
-import com.medicalcenter.receptionapi.dto.user.AuthResponseDto;
-import com.medicalcenter.receptionapi.dto.user.RegisterRequestDto;
-import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
-import com.medicalcenter.receptionapi.dto.user.UserDetailsDto;
+import com.medicalcenter.receptionapi.dto.user.*;
 import com.medicalcenter.receptionapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -47,33 +44,38 @@ public class UserController {
     }
 
     @GetMapping("/details")
-    public ResponseEntity<UserDetailsDto> getUserDetails(HttpServletRequest request){
+    public ResponseEntity<UserDetailsDto> getUserDetails(HttpServletRequest request) {
         UserDetailsDto userDetailsDto = userService.getUserDetailsDto(request);
-        if(userDetailsDto != null){
+        if (userDetailsDto != null) {
             return ResponseEntity.ok(userDetailsDto);
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
     @GetMapping("/validate")
-    public ResponseEntity<Boolean> validateAuthentication(HttpServletRequest request){
+    public ResponseEntity<Boolean> validateAuthentication(HttpServletRequest request) {
         if (userService.validateRefreshToken(request)) {
             return ResponseEntity.ok(true);
-        }
-        else {
+        } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
         }
     }
 
     @GetMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request){
+    public ResponseEntity<String> logout(HttpServletRequest request) {
         ResponseCookie emptyRefreshTokenCookie = userService.logout(request);
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, emptyRefreshTokenCookie.toString())
                 .body("Logout successful");
+    }
+
+    @PutMapping("/password")
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequestDto changePasswordRequestDto) {
+        userService.changePassword(changePasswordRequestDto);
+        return ResponseEntity
+                .ok("Password has been successfully changed");
     }
 }
 
