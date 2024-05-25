@@ -10,6 +10,7 @@ import com.medicalcenter.receptionapi.repository.AppointmentRepository;
 import com.medicalcenter.receptionapi.repository.ConsultationRepository;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
+import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.AppointmentSpecification;
 import com.medicalcenter.receptionapi.util.BeanCopyUtils;
@@ -32,6 +33,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @AllArgsConstructor
@@ -41,7 +43,8 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final DoctorRepository doctorRepository;
     private final ConsultationRepository consultationRepository;
-    private ConsultationService consultationService;
+    private final ConsultationService consultationService;
+    private final UserService userService;
 
     public List<Appointment> findAllAppointments() {
         return appointmentRepository.findAll();
@@ -179,6 +182,12 @@ public class AppointmentService {
     @PreAuthorize("hasAnyAuthority('ADMIN', 'RECEPTIONIST') or #appointmentRequestDto.doctorId == authentication.principal.id")
     @CacheEvict(value = {"appointments", "timetable"}, allEntries = true)
     public AppointmentResponseDto updateAppointment(AppointmentRequestDto appointmentRequestDto, Long id) {
+        CustomUserDetails customUserDetails = userService.getCustomUserDetails();
+        Appointment appointmentToUpdate = appointmentRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+        if (userService.hasAnyAuthority(RoleAuthority.DOCTOR.authority)
+                && !Objects.equals(customUserDetails.getId(), appointmentToUpdate.getDoctor().getId())){
+            throw new AccessDeniedException("The doctor can edit only those appointments that are assigned to him");
+        }
         Doctor doctor = doctorRepository.findById(appointmentRequestDto.getDoctorId())
                 .orElseThrow(() -> new ResourceNotFoundException("A doctor with that id doesn't exist"));
         if (!appointmentRequestDto.getTimeStart().isBefore(appointmentRequestDto.getTimeEnd())) {
@@ -211,7 +220,6 @@ public class AppointmentService {
         ) {
             throw new InvalidAppointmentTimeException();
         }
-        Appointment appointmentToUpdate = appointmentRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
         Appointment appointmentUpdateRequest = AppointmentRequestDto.toEntity(appointmentRequestDto);
         appointmentUpdateRequest.setDoctor(doctor);
         BeanCopyUtils.copyNonNullProperties(appointmentUpdateRequest, appointmentToUpdate, "id", "patient");
