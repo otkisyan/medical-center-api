@@ -33,5 +33,4 @@ public class Receptionist {
     @MapsId
     @JoinColumn(name = "user_id")
     private User user;
-
 }

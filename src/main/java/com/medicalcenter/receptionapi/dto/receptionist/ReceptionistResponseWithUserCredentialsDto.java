@@ -1,5 +1,6 @@
 package com.medicalcenter.receptionapi.dto.receptionist;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,9 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReceptionistResponseWithUserCredentialsDto implements Serializable {
+
+    @JsonProperty("receptionist")
     ReceptionistResponseDto receptionistResponseDto;
+    @JsonProperty("userCredentials")
     UserCredentialsDto userCredentialsDto;
 }

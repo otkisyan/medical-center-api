@@ -12,11 +12,9 @@ import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.JwtTokenProvider;
 import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
-import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import jakarta.servlet.http.HttpServletRequest;
 import javafx.util.Pair;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -28,8 +26,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.Objects;
@@ -125,11 +121,12 @@ public class UserService {
     }
 
 
-    public ResponseCookie logout(HttpServletRequest request) {
+    public ResponseCookie logout(HttpServletRequest request){
         String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
         if (refreshToken == null) {
             refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
         }
+
         if (refreshToken != null) {
             RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
             refreshSessionRepository.delete(refreshSession);
@@ -179,7 +176,7 @@ public class UserService {
         String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
         if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
             refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
-            if (refreshToken == null || jwtTokenProvider.validateToken(refreshToken)) {
+            if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
                 throw new InvalidTokenException();
             }
         }

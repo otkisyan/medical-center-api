@@ -1,7 +1,6 @@
 package com.medicalcenter.receptionapi.dto.appointment;
 
 import com.medicalcenter.receptionapi.domain.Appointment;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

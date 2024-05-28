@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -72,6 +73,7 @@ public class ReceptionistService {
     }
 
     @Cacheable(value = "receptionists", key = "#id")
+    @PreAuthorize("hasAnyRole('ADMIN') or #id == authentication.principal.id")
     public ReceptionistResponseDto findReceptionistById(Long id) {
         return receptionistRepository.findById(id).map(ReceptionistResponseDto::ofEntity).orElseThrow(ResourceNotFoundException::new);
     }

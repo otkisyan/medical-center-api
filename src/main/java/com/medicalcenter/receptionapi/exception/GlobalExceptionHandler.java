@@ -1,10 +1,9 @@
 package com.medicalcenter.receptionapi.exception;
 
-import com.medicalcenter.receptionapi.dto.error.Violation;
 import com.medicalcenter.receptionapi.dto.error.ErrorResponse;
 import com.medicalcenter.receptionapi.dto.error.ValidationErrorResponse;
+import com.medicalcenter.receptionapi.dto.error.Violation;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RestControllerAdvice

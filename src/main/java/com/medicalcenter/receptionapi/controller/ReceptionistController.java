@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.controller;
 
-import com.medicalcenter.receptionapi.domain.Receptionist;
 import com.medicalcenter.receptionapi.dto.receptionist.ReceptionistRequestDto;
 import com.medicalcenter.receptionapi.dto.receptionist.ReceptionistResponseDto;
 import com.medicalcenter.receptionapi.dto.receptionist.ReceptionistResponseWithUserCredentialsDto;

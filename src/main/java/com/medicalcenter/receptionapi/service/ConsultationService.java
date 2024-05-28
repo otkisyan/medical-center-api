@@ -6,7 +6,6 @@ import com.medicalcenter.receptionapi.dto.consultation.ConsultationResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.ConsultationRepository;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
-import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.access.AccessDeniedException;
@@ -23,11 +22,6 @@ public class ConsultationService {
 
     public ConsultationResponseDto findConsultationById(Long appointmentId){
         Consultation consultation = consultationRepository.findById(appointmentId).orElseThrow(ResourceNotFoundException::new);
-        CustomUserDetails customUserDetails = userService.getCustomUserDetails();
-        if(userService.hasAnyAuthority(RoleAuthority.DOCTOR.authority)
-                && !Objects.equals(consultation.getAppointment().getDoctor().getId(), customUserDetails.getId())){
-            throw new AccessDeniedException("Only the doctor to whom the appointment belongs can see the consultation data.");
-        }
         return ConsultationResponseDto.ofEntity(consultation);
     }
 

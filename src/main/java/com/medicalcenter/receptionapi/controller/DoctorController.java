@@ -21,7 +21,6 @@ import java.time.LocalDate;
 @RequestMapping("/doctors")
 public class DoctorController {
 
-
     private final DoctorService doctorService;
 
     @GetMapping()

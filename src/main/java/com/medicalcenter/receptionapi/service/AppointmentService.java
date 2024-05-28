@@ -14,7 +14,6 @@ import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.AppointmentSpecification;
 import com.medicalcenter.receptionapi.util.BeanCopyUtils;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -26,7 +25,6 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

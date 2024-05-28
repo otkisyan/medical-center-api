@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid UserCredentialsDto userCredentialsDto) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid UserCredentialsDto userCredentialsDto)  {
         Pair<ResponseCookie, AuthResponseDto> responsePair = userService.authUser(userCredentialsDto);
         return ResponseEntity
                 .ok()
