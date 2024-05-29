@@ -54,8 +54,8 @@ public class DoctorService {
 
     @Cacheable(value = "doctors", key = "#surname + '_' + #name + '_' + #middleName + '_'" +
             "+ (#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + #medicalSpecialty + '_'  + #page + '_' + #pageSize")
-    public Page<DoctorResponseDto> findAllDoctors(String name,
-                                                  String surname,
+    public Page<DoctorResponseDto> findAllDoctors(String surname,
+                                                  String name,
                                                   String middleName,
                                                   LocalDate birthDate,
                                                   String medicalSpecialty,

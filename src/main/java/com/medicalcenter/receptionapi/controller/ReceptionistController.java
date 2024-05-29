@@ -31,7 +31,7 @@ public class ReceptionistController {
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
         Page<ReceptionistResponseDto> receptionistsPage =
-                receptionistService.findAllReceptionists(name, surname, middleName, birthDate, page, pageSize);
+                receptionistService.findAllReceptionists(surname, name, middleName, birthDate, page, pageSize);
         return ResponseEntity
                 .ok()
                 .body(receptionistsPage);

@@ -48,8 +48,8 @@ public class ReceptionistService {
 
     @Cacheable(value = "receptionists", key = "#surname + '_' + #name + '_' + #middleName + '_'" +
             "+ (#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + '_'  + #page + '_' + #pageSize")
-    public Page<ReceptionistResponseDto> findAllReceptionists(String name,
-                                                              String surname,
+    public Page<ReceptionistResponseDto> findAllReceptionists(String surname,
+                                                              String name,
                                                               String middleName,
                                                               LocalDate birthDate,
                                                               int page,

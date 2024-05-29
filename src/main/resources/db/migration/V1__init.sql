@@ -61,6 +61,7 @@ CREATE TABLE doctor
     medical_specialty VARCHAR(255) NOT NULL,
     address           VARCHAR(255) NOT NULL,
     phone             VARCHAR(255) NOT NULL,
+    CONSTRAINT pk_doctor PRIMARY KEY (user_id),
     CONSTRAINT fk_doctor_user FOREIGN KEY (user_id) REFERENCES user (id),
     CONSTRAINT fk_office FOREIGN KEY (office_id) REFERENCES office (id)
 );
@@ -71,6 +72,7 @@ CREATE TABLE receptionist
     name        VARCHAR(255)          NOT NULL,
     surname     VARCHAR(255)          NOT NULL,
     middle_name VARCHAR(255)          NOT NULL,
+    CONSTRAINT pk_receptionist PRIMARY KEY (user_id),
     CONSTRAINT fk_receptionist_user FOREIGN KEY (user_id) REFERENCES user (id)
 );
 CREATE TABLE appointment
@@ -123,15 +125,15 @@ VALUES (7, 'Неділя');
 
 
 INSERT INTO role (name)
-VALUES ('DOCTOR');
+VALUES ('ROLE_DOCTOR');
 INSERT INTO role (name)
-VALUES ('RECEPTIONIST');
+VALUES ('ROLE_RECEPTIONIST');
 INSERT INTO role (name)
-VALUES ('ADMIN');
+VALUES ('ROLE_ADMIN');
 
 INSERT INTO user (username, password)
 VALUES ('admin', '$2a$10$kwmUaK83Oy1VseVK05ADpugfzRMQIaRo0Ig5kUw6aC7Rz/bGbC2Ta');
 SET @user_id = LAST_INSERT_ID();
 INSERT INTO user_roles (role_id, user_id)
-VALUES ((SELECT id FROM role WHERE name = 'ADMIN'), @user_id);
+VALUES ((SELECT id FROM role WHERE name = 'ROLE_ADMIN'), @user_id);
 
