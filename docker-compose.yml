@@ -24,7 +24,7 @@ services:
     container_name: redis-2
     restart: always
     environment:
-      REDIS_PASSWORD: $HOST_REDIS_PASSWORD
+      REDIS_PASSWORD: $REDIS_PASSWORD
       REDIS_PORT_NUMBER: 6380
     ports:
       - "6380:6380"

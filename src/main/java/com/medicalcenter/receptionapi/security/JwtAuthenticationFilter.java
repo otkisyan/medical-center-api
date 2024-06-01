@@ -29,7 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             "/work-schedules",
             "/appointments",
             "/receptionists",
-            "/consultations"
+            "/consultations",
+            "/user/password"
     );
 
     @Override

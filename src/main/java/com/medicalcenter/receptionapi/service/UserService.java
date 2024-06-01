@@ -120,7 +120,6 @@ public class UserService {
         return new Pair<>(refreshTokenCookie, authResponseDto);
     }
 
-
     public ResponseCookie logout(HttpServletRequest request){
         String refreshToken = jwtTokenProvider.getRefreshTokenFromHttpOnlyCookie(request);
         if (refreshToken == null) {
