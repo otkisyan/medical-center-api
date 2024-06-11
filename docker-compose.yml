@@ -38,12 +38,12 @@ services:
       - "5541:5541"
     depends_on:
       - redis-2
-  app:
+  medical-center-api:
     restart: always
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: app
+    container_name: medical-center-api
     volumes:
       - /tmp
     environment:
