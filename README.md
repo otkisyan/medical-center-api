@@ -7,33 +7,46 @@ This web application was created using the Spring framework for the medical cent
 </p>
 
 ## Table of Contents
-* [Features](#features)
+* [Overview](#overview)
+  * [Features](#features) 
 * [Getting Started](#getting-started)
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
     * [Important Endpoints](#important-endpoints)
 
-## Features
-- View data on all patients, doctors, appointments, offices and departments.
-- View data about a specific patient, i.e. his/her data and appointments.
-- View data about a specific doctor, i.e. his/her data and appointments.
+## Overview
+
+### Features
+
+When working with the application, a **receptionist** has the ability to perform the following tasks:
+
+- View lists of all patients, doctors, appointments, and offices.
+- View data about a specific patient, including their personal data and appointments.
+- View data about a specific doctor, including their personal data, appointments, and work schedule.
 - View data about a specific office.
-- View data about a specific department.
-- Add new, edit and delete existing patients.
-- Add new, edit and delete existing doctors.
-- Add new, edit and delete existing appointments.
-- Add new, edit and delete existing offices of the polyclinic. 
-- Add new, edit and delete existing departments of the polyclinic.
+- View data about a specific patient appointment with a doctor.
+- Add, edit, and delete doctors' work schedules for each day of the week.
+- Add new patients, edit, and delete data about existing patients.
+- Schedule, edit, and cancel patient appointments with doctors (without the ability to edit consultation information, such as: symptoms, diagnoses and medical recommendations).
+- Add new offices, edit, and delete data about existing offices.
 
-| Method 	| Path          	| Description                          	|
-|--------	|---------------	|--------------------------------------	|
-| `GET`    	| `/patients`     	| Get data of all patients             	|
-| `GET`    	| `/patients/{id}` 	| Get a specified patient data         	|
-| `PUT`    	| `/patients/{id}` 	| Save the data of a specified patient 	|
-| `POST`   	| `/patients`     	| Save a new patient                   	|
-| `DELETE`  | `/patients/{id}`     | Remove a specified patient            |
+A **doctor** has the ability to perform the following tasks:
 
-*Similarly for other entities*
+- Add new patients, edit, and delete data about existing patients.
+- View lists of all patients and appointments.
+- View data about a specific patient, including their personal data and appointments.
+- View data about a specific patient appointment with a doctor.
+- Schedule new appointments, edit and cancel his appointments
+- View information about appointment consultation in all appointments, such as: symptoms, diagnosis, medical recommendations. 
+- Enter information about the appointments consultation (only in his own appointments)
+
+An **administrator** inherits all the functionality of a receptionist and has the following additional functions:
+
+- Add new receptionists (including creating a receptionist account), edit, and delete data about existing receptionists.
+- Add new doctors (including creating a doctor account), edit, and delete data about existing doctors.
+- View list of all receptionists.
+- View data about a specific receptionist.
+- View information about appointment consultation in all appointments.
 
 ## Getting Started
 ### Prerequisites:
