@@ -36,4 +36,11 @@ public class Appointment {
     @ManyToOne(optional = false)
     @JoinColumn(name = "patient_id")
     private Patient patient;
+
+    @OneToOne(
+            orphanRemoval = true,
+            mappedBy = "appointment"
+    )
+    private Consultation consultation;
+
 }

@@ -75,6 +75,7 @@ CREATE TABLE receptionist
     CONSTRAINT pk_receptionist PRIMARY KEY (user_id),
     CONSTRAINT fk_receptionist_user FOREIGN KEY (user_id) REFERENCES user (id)
 );
+
 CREATE TABLE appointment
 (
     id         BIGINT AUTO_INCREMENT NOT NULL,

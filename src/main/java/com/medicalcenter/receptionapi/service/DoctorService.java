@@ -17,6 +17,7 @@ import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import lombok.AllArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,6 +35,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Log4j2
 public class DoctorService {
 
     private final DoctorRepository doctorRepository;
@@ -53,15 +55,16 @@ public class DoctorService {
     }
 
     @Cacheable(value = "doctors", key = "#surname + '_' + #name + '_' + #middleName + '_'" +
-            "+ (#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + #medicalSpecialty + '_'  + #page + '_' + #pageSize")
+            "+ (#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + #medicalSpecialty + '_' + #officeNumber + '_' + #page + '_' + #pageSize")
     public Page<DoctorResponseDto> findAllDoctors(String surname,
                                                   String name,
                                                   String middleName,
                                                   LocalDate birthDate,
                                                   String medicalSpecialty,
+                                                  Integer officeNumber,
                                                   int page,
                                                   int pageSize) {
-
+        log.info(officeNumber);
         Specification<Doctor> specs = Specification.where(null);
         if (surname != null && !surname.isBlank()) {
             specs = specs.and(DoctorSpecification.withSurname(surname));
@@ -77,6 +80,9 @@ public class DoctorService {
         }
         if (birthDate != null) {
             specs = specs.and(DoctorSpecification.withBirthDate(birthDate));
+        }
+        if (officeNumber != null) {
+            specs = specs.and(DoctorSpecification.withOffice(officeNumber));
         }
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         Pageable pageable = PageRequest.of(page, pageSize, sort);

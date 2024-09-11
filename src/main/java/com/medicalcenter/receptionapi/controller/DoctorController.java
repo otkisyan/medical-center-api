@@ -30,13 +30,14 @@ public class DoctorController {
             @RequestParam(name = "middleName", required = false) String middleName,
             @RequestParam(name = "birthDate", required = false) LocalDate birthDate,
             @RequestParam(name = "medicalSpecialty", required = false) String medicalSpecialty,
+            @RequestParam(name = "office", required = false) Integer officeNumber,
             @RequestParam(name = "page", defaultValue = "0") Integer page,
             @RequestParam(name = "pageSize", defaultValue = "5") @Max(10) Integer pageSize) {
-        Page<DoctorResponseDto> doctorsPage = doctorService.findAllDoctors(surname, name, middleName, birthDate, medicalSpecialty, page, pageSize);
+        Page<DoctorResponseDto> doctorsPage = doctorService.findAllDoctors(
+                surname, name, middleName, birthDate, medicalSpecialty, officeNumber, page, pageSize);
         return ResponseEntity
                 .ok()
                 .body(doctorsPage);
-
     }
 
     @GetMapping("/{id}/work-schedules")
