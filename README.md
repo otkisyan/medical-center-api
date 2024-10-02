@@ -82,7 +82,7 @@ An **administrator** inherits all the functionality of a receptionist and has th
 
 ### Important Endpoints:
 * http://localhost:8080 - Application
-* http://localhost:8081 - phpMyAdmin (server: `mariadb`, username: `root`, password: `$MARIADB_ROOT_PASSWORD`)
-* http://localhost:3306 - MariaDB
+* http://localhost:8084 - phpMyAdmin (server: `mariadb`, username: `root`, password: `$MARIADB_ROOT_PASSWORD`)
+* http://localhost:3307 - MariaDB
 * http://localhost:6380 - Redis
 * http://localhost:5541 - RedisInsight (host: `redis-2`, port: `6380`, password: `$REDIS_PASSWORD`)

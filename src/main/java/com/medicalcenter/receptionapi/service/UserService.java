@@ -13,7 +13,6 @@ import com.medicalcenter.receptionapi.security.JwtTokenProvider;
 import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
 import jakarta.servlet.http.HttpServletRequest;
-import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -72,12 +71,12 @@ public class UserService {
      * Authenticates a user based on the provided {@link UserCredentialsDto} and generates access and refresh tokens upon successful authentication.
      *
      * @param userCredentialsDto An object containing the user's authentication credentials (username and password).
-     * @return A Pair containing a ResponseCookie representing the refresh token cookie and
+     * @return An AuthResponseWithCookieDto containing a ResponseCookie representing the refresh token cookie and
      * an AuthResponseDto containing the generated access and refresh tokens along with their expirations dates
      * @throws org.springframework.security.core.AuthenticationException If authentication fails.
      * @throws UsernameNotFoundException                                 If the user is not found.
      */
-    public Pair<ResponseCookie, AuthResponseDto> authUser(UserCredentialsDto userCredentialsDto) {
+    public AuthResponeWithResponseCookieDto authUser(UserCredentialsDto userCredentialsDto) {
         Authentication auth = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 userCredentialsDto.getUsername(),
                 userCredentialsDto.getPassword()));
@@ -91,7 +90,7 @@ public class UserService {
                 .build());
         ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshTokenDto);
         AuthResponseDto authResponseDto = createAuthResponseDto(accessTokenDto, refreshTokenDto);
-        return new Pair<>(refreshTokenCookie, authResponseDto);
+        return new AuthResponeWithResponseCookieDto(authResponseDto, refreshTokenCookie);
     }
 
     /**
@@ -99,14 +98,14 @@ public class UserService {
      * HttpServletRequest and returns an {@link AuthResponseDto} containing the new tokens and their expiration dates.
      *
      * @param request The HttpServletRequest containing the refresh token to perform token refresh.
-     * @return A Pair containing a ResponseCookie representing the refresh token cookie and
+     * @return An AuthResponseWithCookieDto containing a ResponseCookie representing the refresh token cookie and
      * an AuthResponseDto containing the generated access and refresh tokens along with their expirations dates
      * @throws InvalidTokenException         If the provided refresh token is null or invalid.
      * @throws InvalidTokenTypeException     If the refresh token is of an invalid token type.
      * @throws RefreshTokenNotFoundException If the refresh token is not found in the repository.
      * @throws UsernameNotFoundException     If the associated user is not found in the repository.
      */
-    public Pair<ResponseCookie, AuthResponseDto> refresh(HttpServletRequest request) {
+    public AuthResponeWithResponseCookieDto refresh(HttpServletRequest request) {
         String refreshToken = getRefreshToken(request);
         String username = jwtTokenProvider.getUsernameFromJwt(refreshToken);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -117,7 +116,7 @@ public class UserService {
         refreshSessionRepository.save(refreshSession);
         ResponseCookie refreshTokenCookie = createRefreshTokenCookie(refreshTokenDto);
         AuthResponseDto authResponseDto = createAuthResponseDto(accessTokenDto, refreshTokenDto);
-        return new Pair<>(refreshTokenCookie, authResponseDto);
+        return new AuthResponeWithResponseCookieDto(authResponseDto, refreshTokenCookie);
     }
 
     public ResponseCookie logout(HttpServletRequest request){

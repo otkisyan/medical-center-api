@@ -2,21 +2,24 @@ version: '3.9'
 services:
   mariadb:
     image: mariadb
-    container_name: mariadb
+    container_name: mariadb-2
     restart: always
     environment:
       MARIADB_ROOT_PASSWORD: $MARIADB_ROOT_PASSWORD
       MARIADB_DATABASE: $MARIADB_DATABASE
+      MYSQL_TCP_PORT: 3307
+      MYSQL_UNIX_PORT: 3307
     ports:
-      - "3306:3306"
+      - "3307:3307"
   phpmyadmin:
-    image: phpmyadmin
-    container_name: phpmyadmin
+    image: bitnami/phpmyadmin:latest
+    container_name: phpmyadmin-2
     restart: always
     ports:
-      - "8081:80"
+      - "8084:8082"
     environment:
-      - PMA_ARBITRARY=1
+      - DATABASE_PORT_NUMBER=3307
+      - APACHE_HTTP_PORT_NUMBER=8082
     depends_on:
       - mariadb
   redis-2:
@@ -50,6 +53,10 @@ services:
       SPRING_DATASOURCE_URL: $SPRING_DATASOURCE_URL
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: $MARIADB_ROOT_PASSWORD
+      SPRING_DATA_REDIS_HOST: $DOCKER_REDIS_HOST
+      SECURITY_JWT_SECRET: $JWT_SECRET
+      SECURITY_JWT_ACCESS-TOKEN_EXPIRATION: $JWT_ACCESS_TOKEN_EXPIRATION
+      SECURITY_JWT_REFRESH-TOKEN_EXPIRATION: $JWT_REFRESH_TOKEN_EXPIRATION
     ports:
       - "8080:8080"
     depends_on:

@@ -4,7 +4,6 @@ import com.medicalcenter.receptionapi.dto.user.*;
 import com.medicalcenter.receptionapi.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import javafx.util.Pair;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -27,20 +26,20 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@RequestBody @Valid UserCredentialsDto userCredentialsDto)  {
-        Pair<ResponseCookie, AuthResponseDto> responsePair = userService.authUser(userCredentialsDto);
+        AuthResponeWithResponseCookieDto responsePair = userService.authUser(userCredentialsDto);
         return ResponseEntity
                 .ok()
-                .header(HttpHeaders.SET_COOKIE, responsePair.getKey().toString())
-                .body(responsePair.getValue());
+                .header(HttpHeaders.SET_COOKIE, String.valueOf(responsePair.getResponseCookie()))
+                .body(responsePair.getAuthResponseDto());
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponseDto> refresh(HttpServletRequest request) {
-        Pair<ResponseCookie, AuthResponseDto> responsePair = userService.refresh(request);
+        AuthResponeWithResponseCookieDto responsePair = userService.refresh(request);
         return ResponseEntity
                 .ok()
-                .header(HttpHeaders.SET_COOKIE, responsePair.getKey().toString())
-                .body(responsePair.getValue());
+                .header(HttpHeaders.SET_COOKIE, String.valueOf(responsePair.getResponseCookie()))
+                .body(responsePair.getAuthResponseDto());
     }
 
     @GetMapping("/details")

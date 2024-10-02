@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password: password
+  flyway:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+  cache:
+    type: none
+server:
+  port: 8080
+security:
+  jwt:
+    secret: dummy-secret
+    access-token:
+      expiration: 3600
+    refresh-token:
+      expiration: 86400

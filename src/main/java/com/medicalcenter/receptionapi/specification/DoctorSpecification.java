@@ -3,7 +3,6 @@ package com.medicalcenter.receptionapi.specification;
 import com.medicalcenter.receptionapi.domain.Doctor;
 import com.medicalcenter.receptionapi.domain.Office;
 import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
