@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  pull_request: # all pull requests
+  push:
+    branches:
+      - master
+
+jobs:
+  liberica:
+    strategy:
+      matrix:
+        java: [ '17', '18', '21' ]
+    name: jdk-${{ matrix.java }}-liberica
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'liberica'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+      - name: Test
+        run: mvn -B test -Dspring.profiles.active=ci
+      - name: Build
+        run: mvn -B clean package -DskipTests -Dspring.profiles.active=ci
+
+  temurin:
+    strategy:
+      matrix:
+        java: [ '17', '18', '21' ]
+    name: jdk-${{ matrix.java }}-temurin
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+          cache: 'maven'
+      - name: Test
+        run: mvn -B test -Dspring.profiles.active=ci
+      - name: Build
+        run: mvn -B clean package -DskipTests -Dspring.profiles.active=ci

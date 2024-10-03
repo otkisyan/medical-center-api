@@ -6,5 +6,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
+  cache:
+    type: none
   flyway:
     enabled: false

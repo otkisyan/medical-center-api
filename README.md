@@ -3,6 +3,7 @@
 Medical Center
 </h1>
 <p align="center">
+![ci](https://https://github.com/otkisyan/medical-center-api/actions/workflows/ci.yml/badge.svg)
 This web application was created using the Spring framework for the medical center reception desk to provide convenient and efficient work with patients and patient appointments with doctors. The application has a convenient and pleasant user interface.
 </p>
 
