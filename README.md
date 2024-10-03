@@ -4,11 +4,15 @@ Medical Center
 </h1>
 <div align="center">
 
-![ci](https://github.com/otkisyan/medical-center-api/actions/workflows/ci.yml/badge.svg)
+[![ci](https://github.com/otkisyan/medical-center-api/actions/workflows/ci.yml/badge.svg)](https://github.com/otkisyan/medical-center-api/actions/workflows/ci.yml)
 
 </div>
 <p align="center">
-This web application was created using the Spring framework for the medical center reception desk to provide convenient and efficient work with patients and patient appointments with doctors. The application has a convenient and pleasant user interface.
+
+A sleek Spring Boot application designed for efficient management of patients, doctors, work schedules, 
+and appointments in a medical center, supporting roles for receptionists, doctors, and administrators. 
+It features a robust RESTful backend powered by MariaDB and Redis. A secure JWT-based authentication, and Docker for seamless deployment. 
+
 </p>
 
 ## Table of Contents
