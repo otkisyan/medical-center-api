@@ -253,7 +253,8 @@ public class AppointmentService {
       allEntries = true)
   public void deleteAppointment(Long id) {
     Appointment appointmentToDelete = appointmentRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Appointment with such id is not found"));
+            .orElseThrow(() ->
+                    new ResourceNotFoundException("Appointment with such id is not found"));
     CustomUserDetails currentUser = userService.getCustomUserDetails();
     if (userService.hasAnyAuthority(RoleAuthority.DOCTOR.authority)
             && !Objects.equals(currentUser.getId(), appointmentToDelete.getDoctor().getId())) {
