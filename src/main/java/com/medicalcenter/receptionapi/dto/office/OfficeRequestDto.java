@@ -2,12 +2,11 @@ package com.medicalcenter.receptionapi.dto.office;
 
 import com.medicalcenter.receptionapi.domain.Office;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @Builder
@@ -15,12 +14,13 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class OfficeRequestDto implements Serializable {
 
-    @NotNull
-    private Integer number;
-    @NotNull
-    private String name;
+  @NotNull private Integer number;
+  @NotNull private String name;
 
-    public static Office toEntity(OfficeRequestDto officeRequestDto) {
-        return Office.builder().name(officeRequestDto.getName()).number(officeRequestDto.getNumber()).build();
-    }
+  public static Office toEntity(OfficeRequestDto officeRequestDto) {
+    return Office.builder()
+        .name(officeRequestDto.getName())
+        .number(officeRequestDto.getNumber())
+        .build();
+  }
 }

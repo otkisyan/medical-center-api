@@ -8,6 +8,21 @@ on:
       - master
 
 jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'liberica'
+          java-version: 17
+          cache: 'maven'
+      - name: Checkstyle Coverage
+        run: mvn -B checkstyle:check
+
   liberica:
     strategy:
       matrix:

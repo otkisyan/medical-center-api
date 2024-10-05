@@ -1,12 +1,11 @@
 package com.medicalcenter.receptionapi.dto.consultation;
 
 import com.medicalcenter.receptionapi.domain.Consultation;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
@@ -14,15 +13,15 @@ import java.io.Serializable;
 @Builder
 public class ConsultationRequestDto implements Serializable {
 
-    private String diagnosis;
-    private String symptoms;
-    private String medicalRecommendations;
+  private String diagnosis;
+  private String symptoms;
+  private String medicalRecommendations;
 
-    public static Consultation toEntity(ConsultationRequestDto consultationRequestDto){
-        return Consultation.builder()
-                .diagnosis(consultationRequestDto.getDiagnosis())
-                .symptoms(consultationRequestDto.getSymptoms())
-                .medicalRecommendations(consultationRequestDto.getMedicalRecommendations())
-                .build();
-    }
+  public static Consultation toEntity(ConsultationRequestDto consultationRequestDto) {
+    return Consultation.builder()
+        .diagnosis(consultationRequestDto.getDiagnosis())
+        .symptoms(consultationRequestDto.getSymptoms())
+        .medicalRecommendations(consultationRequestDto.getMedicalRecommendations())
+        .build();
+  }
 }

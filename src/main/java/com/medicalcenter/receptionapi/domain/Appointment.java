@@ -1,10 +1,9 @@
 package com.medicalcenter.receptionapi.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+import lombok.*;
 
 @Getter
 @Setter
@@ -15,32 +14,28 @@ import java.time.LocalTime;
 @NoArgsConstructor
 public class Appointment {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
+  private Long id;
 
-    @Column(name = "date", nullable = false)
-    private LocalDate date;
+  @Column(name = "date", nullable = false)
+  private LocalDate date;
 
-    @Column(name = "time_start", nullable = false)
-    private LocalTime timeStart;
+  @Column(name = "time_start", nullable = false)
+  private LocalTime timeStart;
 
-    @Column(name = "time_end", nullable = false)
-    private LocalTime timeEnd;
+  @Column(name = "time_end", nullable = false)
+  private LocalTime timeEnd;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "doctor_id")
-    private Doctor doctor;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "doctor_id")
+  private Doctor doctor;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "patient_id")
-    private Patient patient;
+  @ManyToOne(optional = false)
+  @JoinColumn(name = "patient_id")
+  private Patient patient;
 
-    @OneToOne(
-            orphanRemoval = true,
-            mappedBy = "appointment"
-    )
-    private Consultation consultation;
-
+  @OneToOne(orphanRemoval = true, mappedBy = "appointment")
+  private Consultation consultation;
 }

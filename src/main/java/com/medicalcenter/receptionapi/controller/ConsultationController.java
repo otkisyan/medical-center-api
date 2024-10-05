@@ -12,20 +12,22 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/consultations")
 public class ConsultationController {
 
-    private ConsultationService consultationService;
+  private ConsultationService consultationService;
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ConsultationResponseDto> findConsultationById(@PathVariable("id") Long appointmentId){
-        ConsultationResponseDto consultationResponseDto = consultationService.findConsultationById(appointmentId);
-        return ResponseEntity.ok(consultationResponseDto);
-    }
+  @GetMapping("/{id}")
+  public ResponseEntity<ConsultationResponseDto> findConsultationById(
+      @PathVariable("id") Long appointmentId) {
+    ConsultationResponseDto consultationResponseDto =
+        consultationService.findConsultationById(appointmentId);
+    return ResponseEntity.ok(consultationResponseDto);
+  }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ConsultationResponseDto> updateConsultation(
-            @PathVariable("id") Long appointmentId,
-            @RequestBody ConsultationRequestDto consultationRequestDto){
-        ConsultationResponseDto consultationResponseDto =
-                consultationService.updateConsultation(appointmentId, consultationRequestDto);
-        return ResponseEntity.ok(consultationResponseDto);
-    }
+  @PutMapping("/{id}")
+  public ResponseEntity<ConsultationResponseDto> updateConsultation(
+      @PathVariable("id") Long appointmentId,
+      @RequestBody ConsultationRequestDto consultationRequestDto) {
+    ConsultationResponseDto consultationResponseDto =
+        consultationService.updateConsultation(appointmentId, consultationRequestDto);
+    return ResponseEntity.ok(consultationResponseDto);
+  }
 }

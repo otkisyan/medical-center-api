@@ -11,6 +11,6 @@ import org.springframework.http.ResponseCookie;
 @NoArgsConstructor
 @Builder
 public class AuthResponeWithResponseCookieDto {
-    AuthResponseDto authResponseDto;
-    ResponseCookie responseCookie;
+  AuthResponseDto authResponseDto;
+  ResponseCookie responseCookie;
 }

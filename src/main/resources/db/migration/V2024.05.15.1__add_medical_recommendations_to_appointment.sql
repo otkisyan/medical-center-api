@@ -1,1 +1,2 @@
-ALTER TABLE appointment ADD COLUMN medical_recommendations VARCHAR(1000) NULL after diagnosis
+ALTER TABLE appointment
+    ADD COLUMN medical_recommendations VARCHAR(1000) NULL after diagnosis

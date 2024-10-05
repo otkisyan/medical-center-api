@@ -1,10 +1,9 @@
 package com.medicalcenter.receptionapi.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.LinkedHashSet;
 import java.util.Set;
+import lombok.*;
 
 @Getter
 @Setter
@@ -15,17 +14,17 @@ import java.util.Set;
 @NoArgsConstructor
 public class Office {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id", nullable = false)
+  private Long id;
 
-    @Column(name = "number", nullable = false)
-    private Integer number;
+  @Column(name = "number", nullable = false)
+  private Integer number;
 
-    @Column(name = "name", nullable = false)
-    private String name;
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @OneToMany(mappedBy = "office", orphanRemoval = false)
-    private Set<Doctor> doctors = new LinkedHashSet<>();
+  @OneToMany(mappedBy = "office", orphanRemoval = false)
+  private Set<Doctor> doctors = new LinkedHashSet<>();
 }

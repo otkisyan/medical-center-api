@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/work-schedules")
 public class WorkScheduleController {
 
-    private final WorkScheduleService workScheduleService;
+  private final WorkScheduleService workScheduleService;
 
-    @PutMapping("/{id}")
-    public ResponseEntity<WorkScheduleResponseDto> updateWorkSchedule(
-            @RequestBody @Valid WorkScheduleRequestDto workScheduleRequestDto,
-            @PathVariable("id") Long id) {
-        WorkScheduleResponseDto workScheduleResponseDto = workScheduleService.updateWorkSchedule(workScheduleRequestDto, id);
-        return ResponseEntity.ok(workScheduleResponseDto);
-    }
+  @PutMapping("/{id}")
+  public ResponseEntity<WorkScheduleResponseDto> updateWorkSchedule(
+      @RequestBody @Valid WorkScheduleRequestDto workScheduleRequestDto,
+      @PathVariable("id") Long id) {
+    WorkScheduleResponseDto workScheduleResponseDto =
+        workScheduleService.updateWorkSchedule(workScheduleRequestDto, id);
+    return ResponseEntity.ok(workScheduleResponseDto);
+  }
 }

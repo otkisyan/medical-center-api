@@ -1,10 +1,9 @@
 package com.medicalcenter.receptionapi.domain;
 
 import jakarta.persistence.*;
-import lombok.*;
-
 import java.util.ArrayList;
 import java.util.List;
+import lombok.*;
 
 @Getter
 @Setter
@@ -14,13 +13,13 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DayOfWeek {
-    @Id
-    @Column(name = "day_number", nullable = false)
-    private Integer id;
+  @Id
+  @Column(name = "day_number", nullable = false)
+  private Integer id;
 
-    @Column(name = "name", nullable = false, length = 30)
-    private String name;
+  @Column(name = "name", nullable = false, length = 30)
+  private String name;
 
-    @OneToMany(mappedBy = "dayOfWeek", orphanRemoval = true)
-    private List<WorkSchedule> workSchedules = new ArrayList<>();
+  @OneToMany(mappedBy = "dayOfWeek", orphanRemoval = true)
+  private List<WorkSchedule> workSchedules = new ArrayList<>();
 }

@@ -2,14 +2,13 @@ package com.medicalcenter.receptionapi.dto.appointment;
 
 import com.medicalcenter.receptionapi.domain.Appointment;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Data
 @AllArgsConstructor
@@ -17,22 +16,17 @@ import java.time.LocalTime;
 @Builder
 public class AppointmentRequestDto implements Serializable {
 
-    @NotNull
-    private LocalDate date;
-    @NotNull
-    private LocalTime timeStart;
-    @NotNull
-    private LocalTime timeEnd;
-    @NotNull
-    private Long patientId;
-    @NotNull
-    private Long doctorId;
+  @NotNull private LocalDate date;
+  @NotNull private LocalTime timeStart;
+  @NotNull private LocalTime timeEnd;
+  @NotNull private Long patientId;
+  @NotNull private Long doctorId;
 
-    public static Appointment toEntity(AppointmentRequestDto appointmentRequestDto) {
-        return Appointment.builder()
-                .date(appointmentRequestDto.getDate())
-                .timeStart(appointmentRequestDto.getTimeStart())
-                .timeEnd(appointmentRequestDto.getTimeEnd())
-                .build();
-    }
+  public static Appointment toEntity(AppointmentRequestDto appointmentRequestDto) {
+    return Appointment.builder()
+        .date(appointmentRequestDto.getDate())
+        .timeStart(appointmentRequestDto.getTimeStart())
+        .timeEnd(appointmentRequestDto.getTimeEnd())
+        .build();
+  }
 }

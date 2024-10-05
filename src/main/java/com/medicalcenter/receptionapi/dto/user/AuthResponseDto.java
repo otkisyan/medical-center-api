@@ -1,12 +1,11 @@
 package com.medicalcenter.receptionapi.dto.user;
 
+import java.io.Serializable;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
-import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -14,9 +13,9 @@ import java.util.Date;
 @Builder
 public class AuthResponseDto implements Serializable {
 
-    private String accessToken;
-    private String refreshToken;
-    private Date accessTokenExpiration;
-    private Date refreshTokenExpiration;
-    private final String tokenType = "Bearer ";
+  private final String tokenType = "Bearer ";
+  private String accessToken;
+  private String refreshToken;
+  private Date accessTokenExpiration;
+  private Date refreshTokenExpiration;
 }

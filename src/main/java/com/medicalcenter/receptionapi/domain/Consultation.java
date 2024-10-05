@@ -12,21 +12,21 @@ import lombok.*;
 @NoArgsConstructor
 public class Consultation {
 
-    @Id
-    @Column(name = "appointment_id", nullable = false)
-    private Long id;
+  @Id
+  @Column(name = "appointment_id", nullable = false)
+  private Long id;
 
-    @Column(name = "diagnosis")
-    private String diagnosis;
+  @Column(name = "diagnosis")
+  private String diagnosis;
 
-    @Column(name = "symptoms")
-    private String symptoms;
+  @Column(name = "symptoms")
+  private String symptoms;
 
-    @Column(name = "medical_recommendations")
-    private String medicalRecommendations;
+  @Column(name = "medical_recommendations")
+  private String medicalRecommendations;
 
-    @OneToOne(cascade = CascadeType.REMOVE)
-    @MapsId
-    @JoinColumn(name = "appointment_id")
-    private Appointment appointment;
+  @OneToOne(cascade = CascadeType.REMOVE)
+  @MapsId
+  @JoinColumn(name = "appointment_id")
+  private Appointment appointment;
 }

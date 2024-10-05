@@ -24,8 +24,8 @@ CREATE TABLE user_roles
 CREATE TABLE refresh_session
 (
     id      BIGINT AUTO_INCREMENT NOT NULL,
-    user_id BIGINT NOT NULL,
-    token VARCHAR(255) NOT NULL,
+    user_id BIGINT                NOT NULL,
+    token   VARCHAR(255)          NOT NULL,
     CONSTRAINT pk_refresh_session PRIMARY KEY (id),
     CONSTRAINT fk_refresh_session_user FOREIGN KEY (user_id) REFERENCES user (id)
 );

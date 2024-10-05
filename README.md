@@ -1,4 +1,3 @@
-
 <h1 align="center">
 Medical Center
 </h1>
@@ -8,16 +7,15 @@ Medical Center
 
 </div>
 <p align="center">
-
 A sleek Spring Boot application designed for efficient management of patients, doctors, work schedules, 
 and appointments in a medical center, supporting roles for receptionists, doctors, and administrators. 
 It features a robust RESTful backend powered by MariaDB and Redis. A secure JWT-based authentication, and Docker for seamless deployment. 
-
 </p>
 
 ## Table of Contents
+
 * [Overview](#overview)
-  * [Features](#features) 
+    * [Features](#features)
 * [Getting Started](#getting-started)
     * [Prerequisites](#prerequisites)
     * [Installation](#installation)
@@ -36,7 +34,8 @@ When working with the application, a **receptionist** has the ability to perform
 - View data about a specific patient appointment with a doctor.
 - Add, edit, and delete doctors' work schedules for each day of the week.
 - Add new patients, edit, and delete data about existing patients.
-- Schedule, edit, and cancel patient appointments with doctors (without the ability to edit consultation information, such as: symptoms, diagnoses and medical recommendations).
+- Schedule, edit, and cancel patient appointments with doctors (without the ability to edit consultation information,
+  such as: symptoms, diagnoses and medical recommendations).
 - Add new offices, edit, and delete data about existing offices.
 
 A **doctor** has the ability to perform the following tasks:
@@ -46,7 +45,8 @@ A **doctor** has the ability to perform the following tasks:
 - View data about a specific patient, including their personal data and appointments.
 - View data about a specific patient appointment with a doctor.
 - Schedule new appointments, edit and cancel his appointments
-- View information about appointment consultation in all appointments, such as: symptoms, diagnosis, medical recommendations. 
+- View information about appointment consultation in all appointments, such as: symptoms, diagnosis, medical
+  recommendations.
 - Enter information about the appointments consultation (only in his own appointments)
 
 An **administrator** inherits all the functionality of a receptionist and has the following additional functions:
@@ -58,38 +58,48 @@ An **administrator** inherits all the functionality of a receptionist and has th
 - View information about appointment consultation in all appointments.
 
 ## Getting Started
+
 ### Prerequisites:
+
 - Docker and Docker Compose
 
 ### Installation
+
 **Before you start:** Change environment variable values in `.env` file for more security or leave it as it is.
+
 1. Clone the repo
 
 ```bash
 > git clone https://github.com/otkisyan/medical-center-api.git
 > cd medical-center-api
 ```
+
 2. Run MariaDB and phpMyAdmin
+
 ```bash
 > docker-compose up -d mariadb phpmyadmin
 ```
 
 3. Run Redis and RedisInsight
+
 ```bash
 > docker-compose up -d redis-2 redisinsight-2
 ```
 
 4. Compile and package the code
+
 ```bash
 > ./mvnw clean package
 ```
 
 5. Run the Application
+
 ```bash
 > docker-compose up -d medical-center-api
 ```
 
 ### Important Endpoints:
+
 * http://localhost:8080 - Application
 * http://localhost:8084 - phpMyAdmin (server: `mariadb`, username: `root`, password: `$MARIADB_ROOT_PASSWORD`)
 * http://localhost:3307 - MariaDB

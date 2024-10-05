@@ -6,6 +6,8 @@ import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -17,73 +19,71 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.util.List;
-
 @Service
 @AllArgsConstructor
 public class PatientService {
 
-    private final PatientRepository patientRepository;
+  private final PatientRepository patientRepository;
 
-    public List<Patient> findAllPatients() {
-        return patientRepository.findAll();
+  @Cacheable(value = "patients", key = "'count'")
+  public long count() {
+    return patientRepository.count();
+  }
+
+  @Cacheable(
+      value = "patients",
+      key =
+          "#surname + '_' + #name + '_' + #middleName + '_'"
+              + "+ (#birthDate != null ? #birthDate.toString() : 'null' )"
+              + "+ '_' + #page + '_' + #pageSize")
+  public Page<PatientResponseDto> findAllPatients(
+      String surname, String name, String middleName, LocalDate birthDate, int page, int pageSize) {
+
+    Specification<Patient> specs = Specification.where(null);
+    if (surname != null && !surname.isBlank()) {
+      specs = specs.and(PatientSpecification.withSurname(surname));
     }
-
-    @Cacheable(value = "patients", key = "'count'")
-    public long count() {
-        return patientRepository.count();
+    if (name != null && !name.isBlank()) {
+      specs = specs.and(PatientSpecification.withName(name));
     }
-
-    @Cacheable(value = "patients", key = "#surname + '_' + #name + '_' + #middleName + '_' + " +
-            "(#birthDate != null ? #birthDate.toString() : 'null' ) + '_' + #page + '_' + #pageSize")
-    public Page<PatientResponseDto> findAllPatients(String surname,
-                                                    String name,
-                                                    String middleName,
-                                                    LocalDate birthDate,
-                                                    int page,
-                                                    int pageSize) {
-
-        Specification<Patient> specs = Specification.where(null);
-        if (surname != null && !surname.isBlank()) {
-            specs = specs.and(PatientSpecification.withSurname(surname));
-        }
-        if (name != null && !name.isBlank()) {
-            specs = specs.and(PatientSpecification.withName(name));
-        }
-        if (middleName != null && !middleName.isBlank()) {
-            specs = specs.and(PatientSpecification.withMiddleName(middleName));
-        }
-        if (birthDate != null) {
-            specs = specs.and(PatientSpecification.withBirthDate(birthDate));
-        }
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        Pageable pageable = PageRequest.of(page, pageSize, sort);
-        return patientRepository.findAll(specs, pageable).map(PatientResponseDto::ofEntity);
+    if (middleName != null && !middleName.isBlank()) {
+      specs = specs.and(PatientSpecification.withMiddleName(middleName));
     }
-
-    @Cacheable(value = "patients", key = "#id")
-    public PatientResponseDto findPatientById(Long id) {
-        Patient patient = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        return PatientResponseDto.ofEntity(patient);
+    if (birthDate != null) {
+      specs = specs.and(PatientSpecification.withBirthDate(birthDate));
     }
+    Sort sort = Sort.by(Sort.Direction.DESC, "id");
+    Pageable pageable = PageRequest.of(page, pageSize, sort);
+    return patientRepository.findAll(specs, pageable).map(PatientResponseDto::ofEntity);
+  }
 
-    @CacheEvict(value = "patients", allEntries = true)
-    public PatientResponseDto savePatient(PatientRequestDto patientRequestDto) {
-        Patient patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
-        return PatientResponseDto.ofEntity(patient);
-    }
+  public List<Patient> findAllPatients() {
+    return patientRepository.findAll();
+  }
 
-    @CacheEvict(value = "patients", allEntries = true)
-    public PatientResponseDto updatePatient(PatientRequestDto patientRequestDto, Long id) {
-        Patient patientToUpdate = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-        BeanUtils.copyProperties(patientRequestDto, patientToUpdate, "id", "appointments");
-        Patient patient = patientRepository.save(patientToUpdate);
-        return PatientResponseDto.ofEntity(patient);
-    }
+  @Cacheable(value = "patients", key = "#id")
+  public PatientResponseDto findPatientById(Long id) {
+    Patient patient = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    return PatientResponseDto.ofEntity(patient);
+  }
 
-    @CacheEvict(value = "patients", allEntries = true)
-    public void deletePatient(Long id) {
-        patientRepository.deleteById(id);
-    }
+  @CacheEvict(value = "patients", allEntries = true)
+  public PatientResponseDto savePatient(PatientRequestDto patientRequestDto) {
+    Patient patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
+    return PatientResponseDto.ofEntity(patient);
+  }
+
+  @CacheEvict(value = "patients", allEntries = true)
+  public PatientResponseDto updatePatient(PatientRequestDto patientRequestDto, Long id) {
+    Patient patientToUpdate =
+        patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
+    BeanUtils.copyProperties(patientRequestDto, patientToUpdate, "id", "appointments");
+    Patient patient = patientRepository.save(patientToUpdate);
+    return PatientResponseDto.ofEntity(patient);
+  }
+
+  @CacheEvict(value = "patients", allEntries = true)
+  public void deletePatient(Long id) {
+    patientRepository.deleteById(id);
+  }
 }

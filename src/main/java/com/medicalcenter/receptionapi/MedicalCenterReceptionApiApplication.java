@@ -8,8 +8,7 @@ import org.springframework.cache.annotation.EnableCaching;
 @EnableCaching
 public class MedicalCenterReceptionApiApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(MedicalCenterReceptionApiApplication.class, args);
-	}
-
+  public static void main(String[] args) {
+    SpringApplication.run(MedicalCenterReceptionApiApplication.class, args);
+  }
 }
