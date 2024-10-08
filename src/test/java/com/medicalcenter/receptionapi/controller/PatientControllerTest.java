@@ -1,24 +1,37 @@
 package com.medicalcenter.receptionapi.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.medicalcenter.receptionapi.config.WebSecurityConfig;
+import com.medicalcenter.receptionapi.dto.patient.PatientRequestDto;
+import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.service.PatientService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.time.LocalDate;
+
 @WebMvcTest(PatientController.class)
-@Import(WebSecurityConfig.class)
-// @AutoConfigureMockMvc(addFilters = false)
 public class PatientControllerTest {
 
   @Autowired private WebApplicationContext webApplicationContext;
@@ -35,37 +48,44 @@ public class PatientControllerTest {
         MockMvcBuilders.webAppContextSetup(webApplicationContext).apply(springSecurity()).build();
   }
 
-  /* @Test
+  @Test
+  @WithMockUser(
+      username = "test",
+      roles = {"USER", "ADMIN"})
   public void PatientController_Save_ReturnCreated() throws Exception {
-      PatientResponseDto patientRequestDto = PatientResponseDto.builder()
-              .name("Name")
-              .surname("Surname")
-              .middleName("Middle name")
-              .address("Address")
-              .phone("Phone")
-              .messengerContact("Messenger contact")
-              .birthDate(LocalDate.of(2023, 2, 1))
-              .preferentialCategory("Preferential category")
-              .build();
-      PatientResponseDto patientResponseDto = PatientResponseDto.builder()
-              .id(1L)
-              .name("Name")
-              .surname("Surname")
-              .middleName("Middle name")
-              .address("Address")
-              .phone("Phone")
-              .messengerContact("Messenger contact")
-              .birthDate(LocalDate.of(2023, 2, 1))
-              .preferentialCategory("Preferential category")
-              .build();
-      when(patientService.savePatient(any(PatientResponseDto.class))).thenReturn(patientResponseDto);
-      this.mockMvc.perform(post("/patients")
-                      .with(csrf())
-                      .contentType(MediaType.APPLICATION_JSON)
-                      .content(objectMapper.writeValueAsString(patientRequestDto)))
-              .andDo(MockMvcResultHandlers.print())
-              .andExpect(status().isCreated());
-  }*/
+    PatientResponseDto patientRequestDto =
+        PatientResponseDto.builder()
+            .name("Name")
+            .surname("Surname")
+            .middleName("Middle name")
+            .address("Address")
+            .phone("Phone")
+            .messengerContact("Messenger contact")
+            .birthDate(LocalDate.of(2023, 2, 1))
+            .preferentialCategory("Preferential category")
+            .build();
+    PatientResponseDto patientResponseDto =
+        PatientResponseDto.builder()
+            .id(1L)
+            .name("Name")
+            .surname("Surname")
+            .middleName("Middle name")
+            .address("Address")
+            .phone("Phone")
+            .messengerContact("Messenger contact")
+            .birthDate(LocalDate.of(2023, 2, 1))
+            .preferentialCategory("Preferential category")
+            .build();
+    when(patientService.savePatient(any(PatientRequestDto.class))).thenReturn(patientResponseDto);
+    this.mockMvc
+        .perform(
+            post("/patients")
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(patientRequestDto)))
+        .andDo(MockMvcResultHandlers.print())
+        .andExpect(status().isCreated());
+  }
 
   /*  @Test
   public void PatientController_FindAll_ReturnPagePatientResponseDto() throws Exception {

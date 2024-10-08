@@ -127,7 +127,7 @@ public class AppointmentService {
 
   @PreAuthorize(
       "hasAnyRole('ADMIN', 'RECEPTIONIST') or"
-              + "#appointmentRequestDto.doctorId == authentication.principal.id")
+          + "#appointmentRequestDto.doctorId == authentication.principal.id")
   @CacheEvict(
       value = {"appointments", "timetable"},
       allEntries = true)
@@ -252,12 +252,14 @@ public class AppointmentService {
       value = {"appointments", "timetable"},
       allEntries = true)
   public void deleteAppointment(Long id) {
-    Appointment appointmentToDelete = appointmentRepository.findById(id)
-            .orElseThrow(() ->
-                    new ResourceNotFoundException("Appointment with such id is not found"));
+    Appointment appointmentToDelete =
+        appointmentRepository
+            .findById(id)
+            .orElseThrow(
+                () -> new ResourceNotFoundException("Appointment with such id is not found"));
     CustomUserDetails currentUser = userService.getCustomUserDetails();
     if (userService.hasAnyAuthority(RoleAuthority.DOCTOR.authority)
-            && !Objects.equals(currentUser.getId(), appointmentToDelete.getDoctor().getId())) {
+        && !Objects.equals(currentUser.getId(), appointmentToDelete.getDoctor().getId())) {
       throw new AccessDeniedException("Doctor can only delete their own appointments");
     }
     appointmentRepository.deleteById(id);
