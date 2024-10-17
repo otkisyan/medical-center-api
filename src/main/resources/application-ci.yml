@@ -19,3 +19,5 @@ security:
       expiration: 3600
     refresh-token:
       expiration: 86400
+cors:
+  allowed-origins: dummy-origin

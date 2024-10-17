@@ -22,6 +22,8 @@ It features a robust RESTful backend powered by MariaDB and Redis. A secure JWT-
     * [Important Endpoints](#important-endpoints)
 
 ## Overview
+This back-end application is intended to be used in conjunction 
+with the [Medical Center Reception Management Frontend](https://github.com/otkisyan/medical-center-frontend).
 
 ### Features
 
@@ -77,7 +79,7 @@ An **administrator** inherits all the functionality of a receptionist and has th
 2. Run MariaDB and phpMyAdmin
 
 ```bash
-> docker-compose up -d mariadb phpmyadmin
+> docker-compose up -d mariadb-2 phpmyadmin-2
 ```
 
 3. Run Redis and RedisInsight
@@ -101,7 +103,7 @@ An **administrator** inherits all the functionality of a receptionist and has th
 ### Important Endpoints:
 
 * http://localhost:8080 - Application
-* http://localhost:8084 - phpMyAdmin (server: `mariadb`, username: `root`, password: `$MARIADB_ROOT_PASSWORD`)
+* http://localhost:8084 - phpMyAdmin (server: `mariadb-2`, username: `root`, password: `$MARIADB_ROOT_PASSWORD`)
 * http://localhost:3307 - MariaDB
 * http://localhost:6380 - Redis
 * http://localhost:5541 - RedisInsight (host: `redis-2`, port: `6380`, password: `$REDIS_PASSWORD`)

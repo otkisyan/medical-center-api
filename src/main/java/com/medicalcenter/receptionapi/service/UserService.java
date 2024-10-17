@@ -132,7 +132,6 @@ public class UserService {
     if (refreshToken == null) {
       refreshToken = jwtTokenProvider.getJwtFromAuthorizationHeader(request);
     }
-
     if (refreshToken != null) {
       RefreshSession refreshSession = findRefreshSessionByToken(refreshToken);
       refreshSessionRepository.delete(refreshSession);

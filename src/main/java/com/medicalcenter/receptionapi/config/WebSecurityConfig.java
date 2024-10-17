@@ -5,6 +5,7 @@ import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import java.util.Arrays;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -26,6 +27,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @AllArgsConstructor
 @EnableMethodSecurity
 public class WebSecurityConfig {
+
+  @Value("${cors.allowed-origins}")
+  private List<String> corsAllowedOrigins;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -149,7 +153,7 @@ public class WebSecurityConfig {
 
   CorsConfigurationSource apiConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOrigins(List.of("https://localhost:3001", "http://localhost:3001"));
+    configuration.setAllowedOrigins(corsAllowedOrigins);
     configuration.setAllowedHeaders(
         List.of("Authorization", "Cache-Control", "Content-Type", "Origin"));
     configuration.setAllowedMethods(
