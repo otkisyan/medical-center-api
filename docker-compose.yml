@@ -1,4 +1,9 @@
 version: '3.9'
+
+networks:
+  medical-center-network:
+    name: medical-center-network
+
 services:
   mariadb-2:
     image: mariadb
@@ -11,6 +16,9 @@ services:
       MYSQL_UNIX_PORT: 3307
     ports:
       - "3307:3307"
+    networks:
+      - medical-center-network
+
   phpmyadmin-2:
     image: bitnami/phpmyadmin:latest
     container_name: phpmyadmin-2
@@ -22,6 +30,9 @@ services:
       - APACHE_HTTP_PORT_NUMBER=8082
     depends_on:
       - mariadb-2
+    networks:
+      - medical-center-network
+
   redis-2:
     image: bitnami/redis:latest
     container_name: redis-2
@@ -31,6 +42,9 @@ services:
       REDIS_PORT_NUMBER: 6380
     ports:
       - "6380:6380"
+    networks:
+      - medical-center-network
+
   redisinsight-2:
     restart: always
     container_name: redisinsight-2
@@ -41,6 +55,9 @@ services:
       - "5541:5541"
     depends_on:
       - redis-2
+    networks:
+      - medical-center-network
+
   medical-center-api:
     restart: always
     build:
@@ -66,3 +83,5 @@ services:
       - phpmyadmin-2
       - redis-2
       - redisinsight-2
+    networks:
+      - medical-center-network
