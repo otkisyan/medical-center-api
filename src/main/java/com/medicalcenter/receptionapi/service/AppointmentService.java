@@ -89,7 +89,7 @@ public class AppointmentService {
 
   @Cacheable(value = "timetable", key = "#doctorId + '_' + #date")
   @PreAuthorize(
-      "hasAnyAuthority('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
+      "hasAnyRole('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
   public List<TimeSlotDto> generateTimetable(Long doctorId, LocalDate date) {
     java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
     WorkSchedule workSchedule =
@@ -99,13 +99,14 @@ public class AppointmentService {
     if (workTimeStart == null || workTimeEnd == null) {
       throw new WorkScheduleDoesNotExistException();
     }
+    int minutesStep = 15;
     List<TimeSlotDto> timeSlots = new ArrayList<>();
     List<Appointment> appointments = findAppointmentsByDoctorAndDate(doctorId, date);
     LocalTime currentTime = workTimeStart;
     while (currentTime.isBefore(workTimeEnd)) {
       TimeSlotDto timeSlot = new TimeSlotDto();
       timeSlot.setStartTime(currentTime);
-      LocalTime slotEndTime = currentTime.plusMinutes(30);
+      LocalTime slotEndTime = currentTime.plusMinutes(minutesStep);
       if (slotEndTime.isAfter(workTimeEnd)) {
         slotEndTime = workTimeEnd;
       }
@@ -113,14 +114,15 @@ public class AppointmentService {
       List<AppointmentResponseDto> slotAppointments = new ArrayList<>();
       for (Appointment appointment : appointments) {
         if (appointment.getTimeStart().isBefore(timeSlot.getEndTime())
-            && appointment.getTimeEnd().isAfter(timeSlot.getStartTime())) {
+                && appointment.getTimeEnd().isAfter(timeSlot.getStartTime())
+                || appointment.getTimeEnd().equals(timeSlot.getStartTime())) {
           slotAppointments.add(AppointmentResponseDto.ofEntity(appointment));
         }
       }
       slotAppointments.sort(Comparator.comparing(AppointmentResponseDto::getTimeStart));
       timeSlot.setAppointments(slotAppointments);
       timeSlots.add(timeSlot);
-      currentTime = currentTime.plusMinutes(30);
+      currentTime = currentTime.plusMinutes(minutesStep);
     }
     return timeSlots;
   }
@@ -186,7 +188,7 @@ public class AppointmentService {
   }
 
   @PreAuthorize(
-      "hasAnyAuthority('ADMIN', 'RECEPTIONIST') or"
+      "hasAnyRole('ADMIN', 'RECEPTIONIST') or"
           + "#appointmentRequestDto.doctorId == authentication.principal.id")
   @CacheEvict(
       value = {"appointments", "timetable"},

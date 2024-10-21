@@ -36,7 +36,9 @@ public class WorkScheduleService {
         .map(WorkScheduleResponseDto::ofEntity);
   }
 
-  @CacheEvict(value = "work-schedules", allEntries = true)
+  @CacheEvict(
+          value = {"work-schedules", "timetable"},
+          allEntries = true)
   public WorkScheduleResponseDto updateWorkSchedule(
       WorkScheduleRequestDto workScheduleRequestDto, Long id) {
     WorkSchedule workScheduleToUpdate =
