@@ -88,8 +88,7 @@ public class AppointmentService {
   }
 
   @Cacheable(value = "timetable", key = "#doctorId + '_' + #date")
-  @PreAuthorize(
-      "hasAnyRole('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
+  @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
   public List<TimeSlotDto> generateTimetable(Long doctorId, LocalDate date) {
     java.time.DayOfWeek dayOfWeek = date.getDayOfWeek();
     WorkSchedule workSchedule =
@@ -105,6 +104,7 @@ public class AppointmentService {
     LocalTime currentTime = workTimeStart;
     while (currentTime.isBefore(workTimeEnd)) {
       TimeSlotDto timeSlot = new TimeSlotDto();
+      timeSlot.setDate(date);
       timeSlot.setStartTime(currentTime);
       LocalTime slotEndTime = currentTime.plusMinutes(minutesStep);
       if (slotEndTime.isAfter(workTimeEnd)) {
@@ -115,7 +115,7 @@ public class AppointmentService {
       for (Appointment appointment : appointments) {
         if (appointment.getTimeStart().isBefore(timeSlot.getEndTime())
                 && appointment.getTimeEnd().isAfter(timeSlot.getStartTime())
-                || appointment.getTimeEnd().equals(timeSlot.getStartTime())) {
+            || appointment.getTimeEnd().equals(timeSlot.getStartTime())) {
           slotAppointments.add(AppointmentResponseDto.ofEntity(appointment));
         }
       }
@@ -152,16 +152,16 @@ public class AppointmentService {
         .existsByPatient_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqual(
             appointmentRequestDto.getPatientId(),
             appointmentRequestDto.getDate(),
-            appointmentRequestDto.getTimeEnd(),
-            appointmentRequestDto.getTimeStart())) {
+            appointmentRequestDto.getTimeEnd().minusMinutes(1),
+            appointmentRequestDto.getTimeStart().plusMinutes(1))) {
       throw new AppointmentPatientConflictException();
     }
     if (appointmentRepository
         .existsByDoctor_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqual(
             appointmentRequestDto.getDoctorId(),
             appointmentRequestDto.getDate(),
-            appointmentRequestDto.getTimeEnd(),
-            appointmentRequestDto.getTimeStart())) {
+            appointmentRequestDto.getTimeEnd().minusMinutes(1),
+            appointmentRequestDto.getTimeStart().plusMinutes(1))) {
       throw new AppointmentDoctorConflictException();
     }
     java.time.DayOfWeek dayOfWeek = appointmentRequestDto.getDate().getDayOfWeek();
@@ -215,8 +215,8 @@ public class AppointmentService {
         .existsByDoctor_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqualAndIdNot(
             appointmentRequestDto.getDoctorId(),
             appointmentRequestDto.getDate(),
-            appointmentRequestDto.getTimeEnd(),
-            appointmentRequestDto.getTimeStart(),
+            appointmentRequestDto.getTimeEnd().minusMinutes(1),
+            appointmentRequestDto.getTimeStart().plusMinutes(1),
             id)) {
       throw new AppointmentDoctorConflictException();
     }
@@ -224,8 +224,8 @@ public class AppointmentService {
         .existsByPatient_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqualAndIdNot(
             appointmentRequestDto.getPatientId(),
             appointmentRequestDto.getDate(),
-            appointmentRequestDto.getTimeEnd(),
-            appointmentRequestDto.getTimeStart(),
+            appointmentRequestDto.getTimeEnd().minusMinutes(1),
+            appointmentRequestDto.getTimeStart().plusMinutes(1),
             id)) {
       throw new AppointmentPatientConflictException();
     }

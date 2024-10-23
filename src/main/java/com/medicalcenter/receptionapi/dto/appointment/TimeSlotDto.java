@@ -1,6 +1,7 @@
 package com.medicalcenter.receptionapi.dto.appointment;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TimeSlotDto implements Serializable {
   List<AppointmentResponseDto> appointments;
+  private LocalDate date;
   private LocalTime startTime;
   private LocalTime endTime;
 }
