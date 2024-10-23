@@ -22,7 +22,8 @@ It features a robust RESTful backend powered by MariaDB and Redis. A secure JWT-
     * [Important Endpoints](#important-endpoints)
 
 ## Overview
-This back-end application is intended to be used in conjunction 
+
+This back-end application is intended to be used in conjunction
 with the [Medical Center Reception Management Frontend](https://github.com/otkisyan/medical-center-frontend).
 
 ### Features

@@ -10,7 +10,6 @@ import jakarta.validation.constraints.Max;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -41,7 +40,7 @@ public final class AppointmentController {
 
   @GetMapping("/timetable/{id}")
   public ResponseEntity<List<TimeSlotDto>> getTimeTable(
-          @PathVariable("id") Long doctorId, @RequestParam(name = "date") LocalDate date) {
+      @PathVariable("id") Long doctorId, @RequestParam(name = "date") LocalDate date) {
     List<TimeSlotDto> timeSlots = appointmentService.generateTimetable(doctorId, date);
     return ResponseEntity.ok(timeSlots);
   }

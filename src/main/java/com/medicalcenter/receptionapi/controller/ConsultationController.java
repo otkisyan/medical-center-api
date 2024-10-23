@@ -27,7 +27,7 @@ public class ConsultationController {
       @PathVariable("id") Long appointmentId,
       @RequestBody ConsultationRequestDto consultationRequestDto) {
     ConsultationResponseDto consultationResponseDto =
-        consultationService.updateConsultation(appointmentId, consultationRequestDto);
+        consultationService.updateConsultation(consultationRequestDto, appointmentId);
     return ResponseEntity.ok(consultationResponseDto);
   }
 }

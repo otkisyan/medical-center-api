@@ -37,8 +37,8 @@ public class WorkScheduleService {
   }
 
   @CacheEvict(
-          value = {"work-schedules", "timetable"},
-          allEntries = true)
+      value = {"work-schedules", "timetable"},
+      allEntries = true)
   public WorkScheduleResponseDto updateWorkSchedule(
       WorkScheduleRequestDto workScheduleRequestDto, Long id) {
     WorkSchedule workScheduleToUpdate =

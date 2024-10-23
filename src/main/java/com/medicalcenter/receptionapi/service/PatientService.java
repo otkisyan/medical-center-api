@@ -39,22 +39,22 @@ public class PatientService {
   public Page<PatientResponseDto> findAllPatients(
       String surname, String name, String middleName, LocalDate birthDate, int page, int pageSize) {
 
-    Specification<Patient> specs = Specification.where(null);
+    Specification<Patient> spec = Specification.where(null);
     if (surname != null && !surname.isBlank()) {
-      specs = specs.and(PatientSpecification.withSurname(surname));
+      spec = spec.and(PatientSpecification.withSurname(surname));
     }
     if (name != null && !name.isBlank()) {
-      specs = specs.and(PatientSpecification.withName(name));
+      spec = spec.and(PatientSpecification.withName(name));
     }
     if (middleName != null && !middleName.isBlank()) {
-      specs = specs.and(PatientSpecification.withMiddleName(middleName));
+      spec = spec.and(PatientSpecification.withMiddleName(middleName));
     }
     if (birthDate != null) {
-      specs = specs.and(PatientSpecification.withBirthDate(birthDate));
+      spec = spec.and(PatientSpecification.withBirthDate(birthDate));
     }
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, pageSize, sort);
-    return patientRepository.findAll(specs, pageable).map(PatientResponseDto::ofEntity);
+    return patientRepository.findAll(spec, pageable).map(PatientResponseDto::ofEntity);
   }
 
   public List<Patient> findAllPatients() {
