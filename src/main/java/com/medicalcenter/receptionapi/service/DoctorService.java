@@ -2,18 +2,16 @@ package com.medicalcenter.receptionapi.service;
 
 import com.medicalcenter.receptionapi.domain.Doctor;
 import com.medicalcenter.receptionapi.domain.Office;
-import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorRequestDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseWithUserCredentialsDto;
 import com.medicalcenter.receptionapi.dto.user.RegisterRequestDto;
 import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
-import com.medicalcenter.receptionapi.dto.user.UserDetailsDto;
 import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
+import com.medicalcenter.receptionapi.mapper.DoctorMapper;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.OfficeRepository;
-import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import java.time.LocalDate;
@@ -37,9 +35,9 @@ public class DoctorService {
 
   private final DoctorRepository doctorRepository;
   private final OfficeRepository officeRepository;
-  private final UserRepository userRepository;
   private final WorkScheduleService workScheduleService;
   private final UserService userService;
+  private final DoctorMapper doctorMapper;
 
   @Cacheable(value = "doctors", key = "'count'")
   public long count() {
@@ -82,7 +80,7 @@ public class DoctorService {
     }
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, pageSize, sort);
-    return doctorRepository.findAll(specs, pageable).map(DoctorResponseDto::ofEntity);
+    return doctorRepository.findAll(specs, pageable).map(doctorMapper::doctorToDoctorResponseDto);
   }
 
   public List<Doctor> findAllDoctors() {
@@ -94,20 +92,22 @@ public class DoctorService {
   public DoctorResponseDto findDoctorById(Long id) {
     return doctorRepository
         .findById(id)
-        .map(DoctorResponseDto::ofEntity)
+        .map(doctorMapper::doctorToDoctorResponseDto)
         .orElseThrow(ResourceNotFoundException::new);
   }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
   public Page<WorkScheduleResponseDto> findDoctorWorkSchedules(
       int page, int pageSize, Long doctorId) {
-    findDoctorById(doctorId);
+    doctorRepository
+            .findById(doctorId)
+            .orElseThrow(ResourceNotFoundException::new);
     return workScheduleService.findWorkSchedulesByDoctorId(page, pageSize, doctorId);
   }
 
   @CacheEvict(value = "doctors", allEntries = true)
   public DoctorResponseWithUserCredentialsDto saveDoctor(DoctorRequestDto doctorRequestDto) {
-    Doctor doctor = DoctorRequestDto.toEntity(doctorRequestDto);
+    Doctor doctor = doctorMapper.doctorRequestDtoToDoctor(doctorRequestDto);
     if (doctorRequestDto.getOfficeId() != null) {
       Optional<Office> officeOptional = officeRepository.findById(doctorRequestDto.getOfficeId());
       if (officeOptional.isPresent()) {
@@ -121,15 +121,11 @@ public class DoctorService {
             .userCredentialsDto(userCredentialsDto)
             .role(RoleAuthority.DOCTOR)
             .build();
-    UserDetailsDto userDetailsDto = userService.saveUser(registerRequestDto);
-    Optional<User> user = userRepository.findByUsername(userDetailsDto.getUsername());
-    if (user.isPresent()) {
-      doctor.setUser(user.get());
-    }
+    userService.saveUser(registerRequestDto, doctor);
     doctor = doctorRepository.save(doctor);
     workScheduleService.createDoctorEmptyWorkSchedules(doctor);
     return DoctorResponseWithUserCredentialsDto.builder()
-        .doctorResponseDto(DoctorResponseDto.ofEntity(doctor))
+        .doctorResponseDto(doctorMapper.doctorToDoctorResponseDto(doctor))
         .userCredentialsDto(userCredentialsDto)
         .build();
   }
@@ -138,7 +134,7 @@ public class DoctorService {
   public DoctorResponseDto updateDoctor(DoctorRequestDto doctorRequestDto, Long id) {
     Doctor doctorToUpdate =
         doctorRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-    Doctor updateRequestDoctor = DoctorRequestDto.toEntity(doctorRequestDto);
+    Doctor updateRequestDoctor = doctorMapper.doctorRequestDtoToDoctor(doctorRequestDto);
     BeanUtils.copyProperties(
         updateRequestDoctor,
         doctorToUpdate,
@@ -157,7 +153,7 @@ public class DoctorService {
       doctorToUpdate.setOffice(null);
     }
     Doctor updatedDoctor = doctorRepository.save(doctorToUpdate);
-    return DoctorResponseDto.ofEntity(updatedDoctor);
+    return doctorMapper.doctorToDoctorResponseDto(updatedDoctor);
   }
 
   @CacheEvict(value = "doctors", allEntries = true)

@@ -1,5 +1,6 @@
 package com.medicalcenter.receptionapi.service;
 
+import com.medicalcenter.receptionapi.domain.Doctor;
 import com.medicalcenter.receptionapi.domain.RefreshSession;
 import com.medicalcenter.receptionapi.domain.Role;
 import com.medicalcenter.receptionapi.domain.User;
@@ -49,25 +50,15 @@ public class UserService {
    *     system.
    */
   public UserDetailsDto saveUser(RegisterRequestDto registerRequestDto) {
-    boolean exists =
-        userRepository.existsByUsername(registerRequestDto.getUserCredentialsDto().getUsername());
-    if (exists) {
-      throw new UserAlreadyExistsException(
-          "user: " + registerRequestDto.getUserCredentialsDto().getUsername() + " already exists");
+    User newUser = createUser(registerRequestDto);
+    return UserDetailsDto.ofEntity(newUser);
+  }
+
+  public UserDetailsDto saveUser(RegisterRequestDto registerRequestDto, Doctor doctor) {
+    User newUser = createUser(registerRequestDto);
+    if (doctor != null) {
+      assignUserToDoctor(doctor, newUser);
     }
-    String passwordHash = encoder.encode(registerRequestDto.getUserCredentialsDto().getPassword());
-    Role role = roleRepository.findByName(registerRequestDto.getRole().authority);
-    User user =
-        User.builder()
-            .username(registerRequestDto.getUserCredentialsDto().getUsername())
-            .password(passwordHash)
-            .roles(Collections.singletonList(role))
-            .accountNonExpired(true)
-            .accountNonLocked(true)
-            .credentialsNonExpired(true)
-            .enabled(true)
-            .build();
-    User newUser = userRepository.save(user);
     return UserDetailsDto.ofEntity(newUser);
   }
 
@@ -265,6 +256,32 @@ public class UserService {
     } catch (IllegalArgumentException | NullPointerException ex) {
       throw new InvalidTokenTypeException();
     }
+  }
+
+  private User createUser(RegisterRequestDto registerRequestDto) {
+    boolean exists =
+        userRepository.existsByUsername(registerRequestDto.getUserCredentialsDto().getUsername());
+    if (exists) {
+      throw new UserAlreadyExistsException(
+          "user: " + registerRequestDto.getUserCredentialsDto().getUsername() + " already exists");
+    }
+    String passwordHash = encoder.encode(registerRequestDto.getUserCredentialsDto().getPassword());
+    Role role = roleRepository.findByName(registerRequestDto.getRole().authority);
+    User user =
+        User.builder()
+            .username(registerRequestDto.getUserCredentialsDto().getUsername())
+            .password(passwordHash)
+            .roles(Collections.singletonList(role))
+            .accountNonExpired(true)
+            .accountNonLocked(true)
+            .credentialsNonExpired(true)
+            .enabled(true)
+            .build();
+    return userRepository.save(user);
+  }
+
+  private void assignUserToDoctor(Doctor doctor, User user) {
+    doctor.setUser(user);
   }
 
   private String generateRandomString(int length) {

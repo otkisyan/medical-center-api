@@ -7,8 +7,8 @@ import com.medicalcenter.receptionapi.dto.appointment.AppointmentResponseDto;
 import com.medicalcenter.receptionapi.dto.appointment.TimeSlotDto;
 import com.medicalcenter.receptionapi.dto.consultation.ConsultationResponseDto;
 import com.medicalcenter.receptionapi.exception.*;
+import com.medicalcenter.receptionapi.mapper.AppointmentMapper;
 import com.medicalcenter.receptionapi.repository.AppointmentRepository;
-import com.medicalcenter.receptionapi.repository.ConsultationRepository;
 import com.medicalcenter.receptionapi.repository.DoctorRepository;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.AppointmentSpecification;
@@ -32,12 +32,12 @@ import org.springframework.stereotype.Service;
 @Service
 @AllArgsConstructor
 public class AppointmentService {
-  private final AppointmentRepository appointmentRepository;
   private final WorkScheduleService workScheduleService;
+  private final ConsultationService consultationService;
+  private final AppointmentRepository appointmentRepository;
   private final PatientRepository patientRepository;
   private final DoctorRepository doctorRepository;
-  private final ConsultationRepository consultationRepository;
-  private final ConsultationService consultationService;
+  private final AppointmentMapper appointmentMapper;
 
   @Cacheable(value = "appointments", key = "'count'")
   public long count() {
@@ -68,7 +68,9 @@ public class AppointmentService {
     }
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, pageSize, sort);
-    return appointmentRepository.findAll(specs, pageable).map(AppointmentResponseDto::ofEntity);
+    return appointmentRepository
+        .findAll(specs, pageable)
+        .map(appointmentMapper::appointmentToAppointmentResponseDto);
   }
 
   public List<Appointment> findAllAppointments() {
@@ -79,7 +81,7 @@ public class AppointmentService {
   public AppointmentResponseDto findAppointmentById(Long id) {
     return appointmentRepository
         .findById(id)
-        .map(AppointmentResponseDto::ofEntity)
+        .map(appointmentMapper::appointmentToAppointmentResponseDto)
         .orElseThrow(ResourceNotFoundException::new);
   }
 
@@ -132,14 +134,12 @@ public class AppointmentService {
     if (!isAppointmentWithinWorkSchedule(appointmentRequestDto, workSchedule)) {
       throw new InvalidAppointmentTimeException();
     }
-    Appointment newAppointment = AppointmentRequestDto.toEntity(appointmentRequestDto);
+    Appointment newAppointment =
+        appointmentMapper.appointmentRequestDtoToAppointment(appointmentRequestDto);
     newAppointment.setDoctor(doctor);
     newAppointment.setPatient(patient);
     newAppointment = appointmentRepository.save(newAppointment);
-    Consultation consultation = new Consultation();
-    consultation.setAppointment(newAppointment);
-    consultationRepository.save(consultation);
-    return AppointmentResponseDto.ofEntity(newAppointment);
+    return appointmentMapper.appointmentToAppointmentResponseDto(newAppointment);
   }
 
   @PreAuthorize(
@@ -174,12 +174,13 @@ public class AppointmentService {
     if (!isAppointmentWithinWorkSchedule(appointmentRequestDto, workSchedule)) {
       throw new InvalidAppointmentTimeException();
     }
-    Appointment appointmentUpdateRequest = AppointmentRequestDto.toEntity(appointmentRequestDto);
+    Appointment appointmentUpdateRequest =
+        appointmentMapper.appointmentRequestDtoToAppointment(appointmentRequestDto);
     appointmentUpdateRequest.setDoctor(doctor);
     BeanCopyUtils.copyNonNullProperties(
         appointmentUpdateRequest, appointmentToUpdate, "id", "patient");
     Appointment updatedAppointment = appointmentRepository.save(appointmentToUpdate);
-    return AppointmentResponseDto.ofEntity(updatedAppointment);
+    return appointmentMapper.appointmentToAppointmentResponseDto(updatedAppointment);
   }
 
   @CacheEvict(
@@ -228,14 +229,14 @@ public class AppointmentService {
   }
 
   private boolean checkPatientConflict(
-          AppointmentRequestDto appointmentRequestDto, Long appointmentId) {
+      AppointmentRequestDto appointmentRequestDto, Long appointmentId) {
     return appointmentRepository
-            .existsByPatient_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqualAndIdNot(
-                    appointmentRequestDto.getPatientId(),
-                    appointmentRequestDto.getDate(),
-                    appointmentRequestDto.getTimeEnd().minusMinutes(1),
-                    appointmentRequestDto.getTimeStart().plusMinutes(1),
-                    appointmentId);
+        .existsByPatient_IdAndDateAndTimeStartLessThanEqualAndTimeEndGreaterThanEqualAndIdNot(
+            appointmentRequestDto.getPatientId(),
+            appointmentRequestDto.getDate(),
+            appointmentRequestDto.getTimeEnd().minusMinutes(1),
+            appointmentRequestDto.getTimeStart().plusMinutes(1),
+            appointmentId);
   }
 
   private boolean checkDoctorConflict(AppointmentRequestDto appointmentRequestDto) {
@@ -274,7 +275,7 @@ public class AppointmentService {
     List<AppointmentResponseDto> slotAppointments = new ArrayList<>();
     for (Appointment appointment : appointments) {
       if (isAppointmentOverlapping(appointment, startTime, endTime)) {
-        slotAppointments.add(AppointmentResponseDto.ofEntity(appointment));
+        slotAppointments.add(appointmentMapper.appointmentToAppointmentResponseDto(appointment));
       }
     }
     slotAppointments.sort(Comparator.comparing(AppointmentResponseDto::getTimeStart));

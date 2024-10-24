@@ -4,6 +4,7 @@ import com.medicalcenter.receptionapi.domain.Patient;
 import com.medicalcenter.receptionapi.dto.patient.PatientRequestDto;
 import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
+import com.medicalcenter.receptionapi.mapper.PatientMapper;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class PatientService {
 
   private final PatientRepository patientRepository;
+  private final PatientMapper patientMapper;
 
   @Cacheable(value = "patients", key = "'count'")
   public long count() {
@@ -54,7 +56,9 @@ public class PatientService {
     }
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, pageSize, sort);
-    return patientRepository.findAll(spec, pageable).map(PatientResponseDto::ofEntity);
+    return patientRepository
+        .findAll(spec, pageable)
+        .map(patientMapper::patientToPatientResponseDto);
   }
 
   public List<Patient> findAllPatients() {
@@ -64,13 +68,14 @@ public class PatientService {
   @Cacheable(value = "patients", key = "#id")
   public PatientResponseDto findPatientById(Long id) {
     Patient patient = patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
-    return PatientResponseDto.ofEntity(patient);
+    return patientMapper.patientToPatientResponseDto(patient);
   }
 
   @CacheEvict(value = "patients", allEntries = true)
   public PatientResponseDto savePatient(PatientRequestDto patientRequestDto) {
-    Patient patient = patientRepository.save(PatientRequestDto.toEntity(patientRequestDto));
-    return PatientResponseDto.ofEntity(patient);
+    Patient patient =
+        patientRepository.save(patientMapper.patientRequestDtoToPatient(patientRequestDto));
+    return patientMapper.patientToPatientResponseDto(patient);
   }
 
   @CacheEvict(value = "patients", allEntries = true)
@@ -79,7 +84,7 @@ public class PatientService {
         patientRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     BeanUtils.copyProperties(patientRequestDto, patientToUpdate, "id", "appointments");
     Patient patient = patientRepository.save(patientToUpdate);
-    return PatientResponseDto.ofEntity(patient);
+    return patientMapper.patientToPatientResponseDto(patient);
   }
 
   @CacheEvict(value = "patients", allEntries = true)

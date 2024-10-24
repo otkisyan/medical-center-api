@@ -5,6 +5,7 @@ import com.medicalcenter.receptionapi.domain.Office;
 import com.medicalcenter.receptionapi.dto.office.OfficeRequestDto;
 import com.medicalcenter.receptionapi.dto.office.OfficeResponseDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
+import com.medicalcenter.receptionapi.mapper.OfficeMapper;
 import com.medicalcenter.receptionapi.repository.OfficeRepository;
 import com.medicalcenter.receptionapi.specification.OfficeSpecification;
 import java.util.List;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 public class OfficeService {
 
   private final OfficeRepository officeRepository;
+  private final OfficeMapper officeMapper;
 
   @Cacheable(value = "offices", key = "'count'")
   public long count() {
@@ -46,7 +48,7 @@ public class OfficeService {
     }
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, pageSize, sort);
-    return officeRepository.findAll(specs, pageable).map(OfficeResponseDto::ofEntity);
+    return officeRepository.findAll(specs, pageable).map(officeMapper::officeToOfficeResponseDto);
   }
 
   public List<Office> findAllOffices() {
@@ -57,14 +59,14 @@ public class OfficeService {
   public OfficeResponseDto findOfficeById(Long id) {
     return officeRepository
         .findById(id)
-        .map(OfficeResponseDto::ofEntity)
+        .map(officeMapper::officeToOfficeResponseDto)
         .orElseThrow(ResourceNotFoundException::new);
   }
 
   @CacheEvict(value = "offices", allEntries = true)
   public OfficeResponseDto saveOffice(OfficeRequestDto officeRequestDto) {
-    Office office = officeRepository.save(OfficeRequestDto.toEntity(officeRequestDto));
-    return OfficeResponseDto.ofEntity(office);
+    Office office = officeRepository.save(officeMapper.officeRequestDtoToOffice(officeRequestDto));
+    return officeMapper.officeToOfficeResponseDto(office);
   }
 
   @CacheEvict(value = "offices", allEntries = true)

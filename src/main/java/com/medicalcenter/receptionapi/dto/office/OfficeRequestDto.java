@@ -23,4 +23,15 @@ public class OfficeRequestDto implements Serializable {
         .number(officeRequestDto.getNumber())
         .build();
   }
+
+  public static OfficeResponseDto ofEntity(Office office) {
+    if (office == null) {
+      return null;
+    }
+    return OfficeResponseDto.builder()
+        .id(office.getId())
+        .name(office.getName())
+        .number(office.getNumber())
+        .build();
+  }
 }
