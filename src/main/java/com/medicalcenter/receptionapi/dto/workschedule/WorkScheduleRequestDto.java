@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.dto.workschedule;
 
-import com.medicalcenter.receptionapi.domain.WorkSchedule;
 import java.io.Serializable;
 import java.time.LocalTime;
 import lombok.AllArgsConstructor;
@@ -17,11 +16,4 @@ public class WorkScheduleRequestDto implements Serializable {
   private Long dayOfWeekId;
   private LocalTime workTimeStart;
   private LocalTime workTimeEnd;
-
-  public static WorkSchedule toEntity(WorkScheduleRequestDto workScheduleRequestDto) {
-    return WorkSchedule.builder()
-        .workTimeStart(workScheduleRequestDto.getWorkTimeStart())
-        .workTimeEnd(workScheduleRequestDto.getWorkTimeEnd())
-        .build();
-  }
 }

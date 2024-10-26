@@ -75,7 +75,7 @@ public class OfficeService {
         officeRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     BeanUtils.copyProperties(officeRequestDto, officeToUpdate, "id", "doctors");
     Office office = officeRepository.save(officeToUpdate);
-    return OfficeResponseDto.ofEntity(office);
+    return officeMapper.officeToOfficeResponseDto(office);
   }
 
   @CacheEvict(value = "offices", allEntries = true)

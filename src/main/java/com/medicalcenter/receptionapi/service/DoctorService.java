@@ -15,7 +15,6 @@ import com.medicalcenter.receptionapi.repository.OfficeRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.DoctorSpecification;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
@@ -83,10 +82,6 @@ public class DoctorService {
     return doctorRepository.findAll(specs, pageable).map(doctorMapper::doctorToDoctorResponseDto);
   }
 
-  public List<Doctor> findAllDoctors() {
-    return doctorRepository.findAll();
-  }
-
   @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #id == authentication.principal.id")
   @Cacheable(value = "doctors", key = "#id")
   public DoctorResponseDto findDoctorById(Long id) {
@@ -99,9 +94,7 @@ public class DoctorService {
   @PreAuthorize("hasAnyRole('ADMIN', 'RECEPTIONIST') or #doctorId == authentication.principal.id")
   public Page<WorkScheduleResponseDto> findDoctorWorkSchedules(
       int page, int pageSize, Long doctorId) {
-    doctorRepository
-            .findById(doctorId)
-            .orElseThrow(ResourceNotFoundException::new);
+    doctorRepository.findById(doctorId).orElseThrow(ResourceNotFoundException::new);
     return workScheduleService.findWorkSchedulesByDoctorId(page, pageSize, doctorId);
   }
 
@@ -123,7 +116,6 @@ public class DoctorService {
             .build();
     userService.saveUser(registerRequestDto, doctor);
     doctor = doctorRepository.save(doctor);
-    workScheduleService.createDoctorEmptyWorkSchedules(doctor);
     return DoctorResponseWithUserCredentialsDto.builder()
         .doctorResponseDto(doctorMapper.doctorToDoctorResponseDto(doctor))
         .userCredentialsDto(userCredentialsDto)

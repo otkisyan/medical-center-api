@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.dto.patient;
 
-import com.medicalcenter.receptionapi.domain.Patient;
 import java.io.Serializable;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -22,18 +21,4 @@ public class PatientResponseDto implements Serializable {
   private String messengerContact;
   private LocalDate birthDate;
   private String preferentialCategory;
-
-  public static PatientResponseDto ofEntity(Patient patient) {
-    return PatientResponseDto.builder()
-        .id(patient.getId())
-        .name(patient.getName())
-        .surname(patient.getSurname())
-        .middleName(patient.getMiddleName())
-        .address(patient.getAddress())
-        .phone(patient.getPhone())
-        .messengerContact(patient.getMessengerContact())
-        .birthDate(patient.getBirthDate())
-        .preferentialCategory(patient.getPreferentialCategory())
-        .build();
-  }
 }

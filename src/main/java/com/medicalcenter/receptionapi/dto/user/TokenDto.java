@@ -13,11 +13,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TokenDto implements Serializable {
-  String token;
-  String subject;
-  Long userId;
-  JwtType jwtType;
-  Date issuedAtDate;
-  Date expirationDate;
-  long expiresInMs;
+  private String token;
+  private String subject;
+  private Long userId;
+  private JwtType jwtType;
+  private Date issuedAtDate;
+  private Date expirationDate;
+  private long expiresInMs;
 }

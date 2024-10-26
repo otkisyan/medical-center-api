@@ -73,10 +73,6 @@ public class AppointmentService {
         .map(appointmentMapper::appointmentToAppointmentResponseDto);
   }
 
-  public List<Appointment> findAllAppointments() {
-    return appointmentRepository.findAll();
-  }
-
   @Cacheable(value = "appointments", key = "#id")
   public AppointmentResponseDto findAppointmentById(Long id) {
     return appointmentRepository

@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RoleDto implements Serializable {
 
-  Long id;
-  String name;
+  private Long id;
+  private String name;
 
   public static RoleDto ofEntity(Role role) {
     return RoleDto.builder().id(role.getId()).name(role.getName()).build();

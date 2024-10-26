@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.dto.doctor;
 
-import com.medicalcenter.receptionapi.domain.Doctor;
 import com.medicalcenter.receptionapi.dto.office.OfficeResponseDto;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -22,20 +21,4 @@ public class DoctorResponseDto implements Serializable {
   private String medicalSpecialty;
   private String qualificationCategory;
   private OfficeResponseDto office;
-
-  public static DoctorResponseDto ofEntity(Doctor doctor) {
-    return DoctorResponseDto.builder()
-        .id(doctor.getId())
-        .name(doctor.getName())
-        .surname(doctor.getSurname())
-        .middleName(doctor.getMiddleName())
-        .address(doctor.getAddress())
-        .phone(doctor.getPhone())
-        .messengerContact(doctor.getMessengerContact())
-        .birthDate(doctor.getBirthDate())
-        .medicalSpecialty(doctor.getMedicalSpecialty())
-        .qualificationCategory(doctor.getQualificationCategory())
-        .office(OfficeResponseDto.ofEntity(doctor.getOffice()))
-        .build();
-  }
 }

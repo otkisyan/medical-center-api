@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class RegisterRequestDto implements Serializable {
   @JsonProperty("userCredentials")
-  UserCredentialsDto userCredentialsDto;
+  private UserCredentialsDto userCredentialsDto;
 
-  RoleAuthority role;
+  private RoleAuthority role;
 }

@@ -1,7 +1,6 @@
 package com.medicalcenter.receptionapi.dto.appointment;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.medicalcenter.receptionapi.domain.Appointment;
 import com.medicalcenter.receptionapi.dto.doctor.DoctorResponseDto;
 import com.medicalcenter.receptionapi.dto.patient.PatientResponseDto;
 import java.io.Serializable;
@@ -27,15 +26,4 @@ public class AppointmentResponseDto implements Serializable {
 
   @JsonProperty("patient")
   private PatientResponseDto patientResponseDto;
-
-  public static AppointmentResponseDto ofEntity(Appointment appointment) {
-    return AppointmentResponseDto.builder()
-        .id(appointment.getId())
-        .date(appointment.getDate())
-        .timeStart(appointment.getTimeStart())
-        .timeEnd(appointment.getTimeEnd())
-        .patientResponseDto(PatientResponseDto.ofEntity(appointment.getPatient()))
-        .doctorResponseDto(DoctorResponseDto.ofEntity(appointment.getDoctor()))
-        .build();
-  }
 }

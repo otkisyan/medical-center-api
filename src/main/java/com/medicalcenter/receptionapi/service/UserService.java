@@ -1,11 +1,9 @@
 package com.medicalcenter.receptionapi.service;
 
-import com.medicalcenter.receptionapi.domain.Doctor;
-import com.medicalcenter.receptionapi.domain.RefreshSession;
-import com.medicalcenter.receptionapi.domain.Role;
-import com.medicalcenter.receptionapi.domain.User;
+import com.medicalcenter.receptionapi.domain.*;
 import com.medicalcenter.receptionapi.dto.user.*;
 import com.medicalcenter.receptionapi.exception.*;
+import com.medicalcenter.receptionapi.mapper.UserMapper;
 import com.medicalcenter.receptionapi.repository.RefreshSessionRepository;
 import com.medicalcenter.receptionapi.repository.RoleRepository;
 import com.medicalcenter.receptionapi.repository.UserRepository;
@@ -36,10 +34,11 @@ public class UserService {
   private final BCryptPasswordEncoder encoder;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
+  private final UserDetailsService userDetailsService;
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final RefreshSessionRepository refreshSessionRepository;
-  private final UserDetailsService userDetailsService;
+  private final UserMapper userMapper;
 
   /**
    * Saves a new user to the DB on the provided registration {@link RegisterRequestDto}
@@ -51,15 +50,23 @@ public class UserService {
    */
   public UserDetailsDto saveUser(RegisterRequestDto registerRequestDto) {
     User newUser = createUser(registerRequestDto);
-    return UserDetailsDto.ofEntity(newUser);
+    return userMapper.userToUserDetailsDto(newUser);
   }
 
   public UserDetailsDto saveUser(RegisterRequestDto registerRequestDto, Doctor doctor) {
     User newUser = createUser(registerRequestDto);
     if (doctor != null) {
-      assignUserToDoctor(doctor, newUser);
+      assignUser(doctor, newUser);
     }
-    return UserDetailsDto.ofEntity(newUser);
+    return userMapper.userToUserDetailsDto(newUser);
+  }
+
+  public UserDetailsDto saveUser(RegisterRequestDto registerRequestDto, Receptionist receptionist) {
+    User newUser = createUser(registerRequestDto);
+    if (receptionist != null) {
+      assignUser(receptionist, newUser);
+    }
+    return userMapper.userToUserDetailsDto(newUser);
   }
 
   /**
@@ -167,7 +174,7 @@ public class UserService {
     String username = jwtTokenProvider.getUsernameFromJwt(refreshToken);
     CustomUserDetails customUserDetails =
         (CustomUserDetails) userDetailsService.loadUserByUsername(username);
-    return UserDetailsDto.ofUserDetails(customUserDetails);
+    return userMapper.userDetailsToUserDetailsDto(customUserDetails);
   }
 
   public CustomUserDetails getCustomUserDetails() {
@@ -280,8 +287,12 @@ public class UserService {
     return userRepository.save(user);
   }
 
-  private void assignUserToDoctor(Doctor doctor, User user) {
+  private void assignUser(Doctor doctor, User user) {
     doctor.setUser(user);
+  }
+
+  private void assignUser(Receptionist receptionist, User user) {
+    receptionist.setUser(user);
   }
 
   private String generateRandomString(int length) {

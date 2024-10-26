@@ -7,8 +7,10 @@ import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleRequestDto;
 import com.medicalcenter.receptionapi.dto.workschedule.WorkScheduleResponseDto;
 import com.medicalcenter.receptionapi.exception.InvalidDoctorWorkTimeException;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
+import com.medicalcenter.receptionapi.mapper.WorkScheduleMapper;
 import com.medicalcenter.receptionapi.repository.DayOfWeekRepository;
 import com.medicalcenter.receptionapi.repository.WorkScheduleRepository;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -26,6 +28,7 @@ public class WorkScheduleService {
 
   private final WorkScheduleRepository workScheduleRepository;
   private final DayOfWeekRepository dayOfWeekRepository;
+  private final WorkScheduleMapper workScheduleMapper;
 
   @Cacheable(value = "work-schedules", key = "#page + '_' + #pageSize + '_' + #doctorId")
   public Page<WorkScheduleResponseDto> findWorkSchedulesByDoctorId(
@@ -33,7 +36,7 @@ public class WorkScheduleService {
     Pageable pageable = PageRequest.of(page, pageSize);
     return workScheduleRepository
         .findByDoctor_Id(doctorId, pageable)
-        .map(WorkScheduleResponseDto::ofEntity);
+        .map(workScheduleMapper::workScheduleToWorkScheduleResponseDto);
   }
 
   @CacheEvict(
@@ -45,18 +48,17 @@ public class WorkScheduleService {
         workScheduleRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     if (workScheduleRequestDto.getWorkTimeStart() != null
         && workScheduleRequestDto.getWorkTimeEnd() != null) {
-      if (workScheduleRequestDto
-          .getWorkTimeStart()
-          .isAfter(workScheduleRequestDto.getWorkTimeEnd())) {
+      if (isTimeStartAfterTimeEnd(
+          workScheduleRequestDto.getWorkTimeStart(), workScheduleRequestDto.getWorkTimeEnd())) {
         throw new InvalidDoctorWorkTimeException();
       }
     }
     WorkSchedule updateRequestWorkSchedule =
-        WorkScheduleRequestDto.toEntity(workScheduleRequestDto);
+        workScheduleMapper.workScheduleRequestDtoToWorkSchedule(workScheduleRequestDto);
     BeanUtils.copyProperties(
         updateRequestWorkSchedule, workScheduleToUpdate, "id", "doctor", "dayOfWeek");
     WorkSchedule updatedWorkSchedule = workScheduleRepository.save(workScheduleToUpdate);
-    return WorkScheduleResponseDto.ofEntity(updatedWorkSchedule);
+    return workScheduleMapper.workScheduleToWorkScheduleResponseDto(updatedWorkSchedule);
   }
 
   public void createDoctorEmptyWorkSchedules(Doctor doctor) {
@@ -76,5 +78,9 @@ public class WorkScheduleService {
 
   public WorkSchedule findWorkScheduleByDoctorAndDayOfWeek(Long doctorId, int dayOfWeek) {
     return workScheduleRepository.findByDoctor_IdAndDayOfWeek_Id(doctorId, dayOfWeek);
+  }
+
+  private boolean isTimeStartAfterTimeEnd(LocalTime start, LocalTime end) {
+    return start.isAfter(end);
   }
 }

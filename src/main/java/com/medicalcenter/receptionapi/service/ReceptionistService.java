@@ -1,21 +1,17 @@
 package com.medicalcenter.receptionapi.service;
 
 import com.medicalcenter.receptionapi.domain.Receptionist;
-import com.medicalcenter.receptionapi.domain.User;
 import com.medicalcenter.receptionapi.dto.receptionist.ReceptionistRequestDto;
 import com.medicalcenter.receptionapi.dto.receptionist.ReceptionistResponseDto;
 import com.medicalcenter.receptionapi.dto.receptionist.ReceptionistResponseWithUserCredentialsDto;
 import com.medicalcenter.receptionapi.dto.user.RegisterRequestDto;
 import com.medicalcenter.receptionapi.dto.user.UserCredentialsDto;
-import com.medicalcenter.receptionapi.dto.user.UserDetailsDto;
 import com.medicalcenter.receptionapi.exception.ResourceNotFoundException;
+import com.medicalcenter.receptionapi.mapper.ReceptionistMapper;
 import com.medicalcenter.receptionapi.repository.ReceptionistRepository;
-import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.enums.RoleAuthority;
 import com.medicalcenter.receptionapi.specification.ReceptionistSpecification;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -34,7 +30,7 @@ public class ReceptionistService {
 
   private final ReceptionistRepository receptionistRepository;
   private final UserService userService;
-  private final UserRepository userRepository;
+  private final ReceptionistMapper receptionistMapper;
 
   @Cacheable(value = "receptionists", key = "'count'")
   public long count() {
@@ -64,11 +60,9 @@ public class ReceptionistService {
     }
     Sort sort = Sort.by(Sort.Direction.DESC, "id");
     Pageable pageable = PageRequest.of(page, pageSize, sort);
-    return receptionistRepository.findAll(specs, pageable).map(ReceptionistResponseDto::ofEntity);
-  }
-
-  public List<Receptionist> findAllReceptionists() {
-    return receptionistRepository.findAll();
+    return receptionistRepository
+        .findAll(specs, pageable)
+        .map(receptionistMapper::receptionistToReceptionistResponseDto);
   }
 
   @Cacheable(value = "receptionists", key = "#id")
@@ -76,28 +70,26 @@ public class ReceptionistService {
   public ReceptionistResponseDto findReceptionistById(Long id) {
     return receptionistRepository
         .findById(id)
-        .map(ReceptionistResponseDto::ofEntity)
+        .map(receptionistMapper::receptionistToReceptionistResponseDto)
         .orElseThrow(ResourceNotFoundException::new);
   }
 
   @CacheEvict(value = "receptionists", allEntries = true)
   public ReceptionistResponseWithUserCredentialsDto saveReceptionist(
       ReceptionistRequestDto receptionistRequestDto) {
-    Receptionist receptionist = ReceptionistRequestDto.toEntity(receptionistRequestDto);
+    Receptionist receptionist =
+        receptionistMapper.receptionistRequestDtoToReceptionist(receptionistRequestDto);
     UserCredentialsDto userCredentialsDto = userService.generateRandomCredentials();
     RegisterRequestDto registerRequestDto =
         RegisterRequestDto.builder()
             .userCredentialsDto(userCredentialsDto)
             .role(RoleAuthority.RECEPTIONIST)
             .build();
-    UserDetailsDto userDetailsDto = userService.saveUser(registerRequestDto);
-    Optional<User> user = userRepository.findByUsername(userDetailsDto.getUsername());
-    if (user.isPresent()) {
-      receptionist.setUser(user.get());
-    }
+    userService.saveUser(registerRequestDto, receptionist);
     receptionist = receptionistRepository.save(receptionist);
     return ReceptionistResponseWithUserCredentialsDto.builder()
-        .receptionistResponseDto(ReceptionistResponseDto.ofEntity(receptionist))
+        .receptionistResponseDto(
+            receptionistMapper.receptionistToReceptionistResponseDto(receptionist))
         .userCredentialsDto(userCredentialsDto)
         .build();
   }
@@ -106,12 +98,12 @@ public class ReceptionistService {
   public ReceptionistResponseDto updateReceptionist(
       ReceptionistRequestDto receptionistRequestDto, Long id) {
     Receptionist updateRequestReceptionist =
-        ReceptionistRequestDto.toEntity(receptionistRequestDto);
+        receptionistMapper.receptionistRequestDtoToReceptionist(receptionistRequestDto);
     Receptionist receptionistToUpdate =
         receptionistRepository.findById(id).orElseThrow(ResourceNotFoundException::new);
     BeanUtils.copyProperties(updateRequestReceptionist, receptionistToUpdate, "id");
     Receptionist updatedReceptionist = receptionistRepository.save(receptionistToUpdate);
-    return ReceptionistResponseDto.ofEntity(updatedReceptionist);
+    return receptionistMapper.receptionistToReceptionistResponseDto(updatedReceptionist);
   }
 
   @CacheEvict(value = "receptionists", allEntries = true)

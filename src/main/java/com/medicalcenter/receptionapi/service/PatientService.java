@@ -8,7 +8,6 @@ import com.medicalcenter.receptionapi.mapper.PatientMapper;
 import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
@@ -59,10 +58,6 @@ public class PatientService {
     return patientRepository
         .findAll(spec, pageable)
         .map(patientMapper::patientToPatientResponseDto);
-  }
-
-  public List<Patient> findAllPatients() {
-    return patientRepository.findAll();
   }
 
   @Cacheable(value = "patients", key = "#id")

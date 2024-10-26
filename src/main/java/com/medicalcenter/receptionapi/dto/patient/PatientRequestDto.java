@@ -1,6 +1,5 @@
 package com.medicalcenter.receptionapi.dto.patient;
 
-import com.medicalcenter.receptionapi.domain.Patient;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDate;
@@ -22,17 +21,4 @@ public class PatientRequestDto implements Serializable {
   private String messengerContact;
   @NotNull private LocalDate birthDate;
   private String preferentialCategory;
-
-  public static Patient toEntity(PatientRequestDto patientRequestDto) {
-    return Patient.builder()
-        .name(patientRequestDto.getName())
-        .surname(patientRequestDto.getSurname())
-        .middleName(patientRequestDto.getMiddleName())
-        .address(patientRequestDto.getAddress())
-        .phone(patientRequestDto.getPhone())
-        .messengerContact(patientRequestDto.getMessengerContact())
-        .birthDate(patientRequestDto.getBirthDate())
-        .preferentialCategory(patientRequestDto.getPreferentialCategory())
-        .build();
-  }
 }

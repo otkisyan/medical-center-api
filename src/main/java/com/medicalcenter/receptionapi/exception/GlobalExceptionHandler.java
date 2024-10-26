@@ -167,6 +167,12 @@ public class GlobalExceptionHandler {
     return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
   }
 
+  @ExceptionHandler(InvalidDoctorWorkTimeException.class)
+  public ResponseEntity<ErrorResponse> handleInvalidDoctorWorkTimeException(
+      InvalidDoctorWorkTimeException ex, HttpServletRequest request) {
+    return buildErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, request);
+  }
+
   @ExceptionHandler(BadCredentialsException.class)
   public ResponseEntity<ErrorResponse> handleBadCredentialsException(HttpServletRequest request) {
     return buildErrorResponse("Invalid username or password", HttpStatus.UNAUTHORIZED, request);
