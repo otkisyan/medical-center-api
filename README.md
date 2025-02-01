@@ -62,8 +62,10 @@ An **administrator** inherits all the functionality of a receptionist and has th
 
 ## Getting Started
 
-### Prerequisites:
+### Prerequisites
 
+- JDK 17+
+- Maven
 - Docker and Docker Compose
 
 ### Installation

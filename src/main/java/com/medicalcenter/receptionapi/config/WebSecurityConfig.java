@@ -61,6 +61,10 @@ public class WebSecurityConfig {
                         RoleAuthority.ADMIN.toString(),
                         RoleAuthority.RECEPTIONIST.toString(),
                         RoleAuthority.DOCTOR.toString())
+                    .requestMatchers(HttpMethod.GET, "/doctors/{id}/work-schedules").hasAnyRole(
+                                RoleAuthority.ADMIN.toString(),
+                                RoleAuthority.RECEPTIONIST.toString(),
+                                RoleAuthority.DOCTOR.toString())
                     // Receptionists
                     .requestMatchers(HttpMethod.DELETE, "/receptionists/{id}")
                     .hasAnyRole(RoleAuthority.ADMIN.toString())
@@ -74,7 +78,7 @@ public class WebSecurityConfig {
                     .hasAnyRole(RoleAuthority.ADMIN.toString())
                     .requestMatchers(HttpMethod.GET, "/receptionists/{id}")
                     .hasAnyRole(
-                        RoleAuthority.ADMIN.toString(), RoleAuthority.RECEPTIONIST.toString())
+                            RoleAuthority.ADMIN.toString(), RoleAuthority.RECEPTIONIST.toString())
                     // Offices
                     .requestMatchers(HttpMethod.GET, "/offices/**")
                     .hasAnyRole(
@@ -91,7 +95,7 @@ public class WebSecurityConfig {
                     .hasAnyRole(
                         RoleAuthority.ADMIN.toString(), RoleAuthority.RECEPTIONIST.toString())
                     // Work Schedules
-                    .requestMatchers("/work-schedules/**")
+                    .requestMatchers(HttpMethod.PUT, "/work-schedules/**")
                     .hasAnyRole(
                         RoleAuthority.RECEPTIONIST.toString(), RoleAuthority.ADMIN.toString())
                     // Appointments
