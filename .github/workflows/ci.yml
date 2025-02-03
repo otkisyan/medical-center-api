@@ -63,9 +63,28 @@ jobs:
       - name: Test
         run: mvn -B clean test -Dspring.profiles.active=ci
 
+  code-coverage:
+    runs-on: ubuntu-latest
+    needs: [lint, liberica, temurin]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'liberica'
+          java-version: '17'
+          cache: 'maven'
+      - name: Run tests and collect coverage
+        run: mvn -B clean test -Dspring.profiles.active=ci
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
   build:
     runs-on: ubuntu-latest
-    needs: [ liberica, temurin ]
+    needs: [ lint, liberica, temurin, code-coverage ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
