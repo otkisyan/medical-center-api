@@ -58,6 +58,73 @@ services:
     networks:
       - medical-center-network
 
+  vmagent:
+    container_name: vmagent
+    image: victoriametrics/vmagent:v1.114.0
+    depends_on:
+      - "victoriametrics"
+    ports:
+      - 8429:8429
+    volumes:
+      - vmagentdata:/vmagentdata
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--promscrape.config=/etc/prometheus/prometheus.yml"
+      - "--remoteWrite.url=http://victoriametrics:8428/api/v1/write"
+    networks:
+      - medical-center-network
+    restart: always
+
+  victoriametrics:
+    container_name: victoriametrics
+    image: victoriametrics/victoria-metrics:v1.114.0
+    ports:
+      - 8428:8428
+      - 8089:8089
+      - 8089:8089/udp
+      - 2003:2003
+      - 2003:2003/udp
+      - 4242:4242
+    volumes:
+      - vmdata:/storage
+    command:
+      - "--storageDataPath=/storage"
+      - "--graphiteListenAddr=:2003"
+      - "--opentsdbListenAddr=:4242"
+      - "--httpListenAddr=:8428"
+      - "--influxListenAddr=:8089"
+    networks:
+      - medical-center-network
+    restart: always
+
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - medical-center-network
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    depends_on:
+      - "victoriametrics"
+    volumes:
+      - grafanadata:/var/lib/grafana
+      - ./config/grafana/provisioning/datasources/prometheus.yml:/etc/grafana/provisioning/datasources/prometheus.yml
+      - ./config/grafana/provisioning/datasources/loki.yml:/etc/grafana/provisioning/datasources/loki.yml
+      - ./config/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/dashboards:/var/lib/grafana/dashboards
+    ports:
+      - '3200:3200'
+    environment:
+      - GF_SERVER_HTTP_PORT=3200
+    networks:
+      - medical-center-network
+    restart: always
+
   medical-center-api:
     restart: always
     build:
@@ -85,3 +152,8 @@ services:
       - redisinsight-2
     networks:
       - medical-center-network
+
+volumes:
+  vmagentdata: {}
+  vmdata: {}
+  grafanadata: {}

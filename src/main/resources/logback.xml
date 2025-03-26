@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <property name="LOG_FILE" value="${LOG_FILE:-${LOG_PATH:-${LOG_TEMP:-${java.io.tmpdir:-/tmp}}}/spring.log}"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <if condition='isDefined("LOKI")'>
+        <then>
+            <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
+                <http>
+                    <url>${LOKI}/loki/api/v1/push</url>
+                </http>
+                <format>
+                    <label>
+                        <pattern>
+                            app = medical-center-api,
+                            host = ${HOSTNAME}
+                        </pattern>
+                        <structuredMetadataPattern>
+                            level = %level,
+                            thread = %thread,
+                            class = %logger,
+                            traceId = %mdc{traceId:-none}
+                        </structuredMetadataPattern>
+                    </label>
+                    <message>
+                        <pattern>%-5level %logger{20} %msg %ex</pattern>
+                    </message>
+                    <sortByTime>true</sortByTime>
+                </format>
+            </appender>
+            <root level="INFO">
+                <appender-ref ref="LOKI"/>
+                <appender-ref ref="CONSOLE"/>
+            </root>
+        </then>
+        <else>
+            <root level="INFO">
+                <appender-ref ref="CONSOLE"/>
+            </root>
+        </else>
+    </if>
+</configuration>

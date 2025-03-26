@@ -9,6 +9,7 @@ import com.medicalcenter.receptionapi.repository.PatientRepository;
 import com.medicalcenter.receptionapi.specification.PatientSpecification;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;

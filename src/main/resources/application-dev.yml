@@ -1,6 +1,6 @@
 spring:
-  config:
-    import: optional:file:.env.dev[.properties]
+#  config:
+#    import: optional:file:.env.dev[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: root
@@ -22,6 +22,13 @@ spring:
       host: ${REDIS_HOST}
       port: 6380
       password: ${REDIS_PASSWORD}
+management:
+  endpoints:
+    web:
+      exposure:
+        include:
+          - health
+          - prometheus
 server:
   port: 8080
 security:
