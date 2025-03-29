@@ -103,6 +103,7 @@ services:
     ports:
       - "3100:3100"
     command: -config.file=/etc/loki/local-config.yaml
+    restart: always
     networks:
       - medical-center-network
 
@@ -120,7 +121,9 @@ services:
     ports:
       - '3200:3200'
     environment:
-      - GF_SERVER_HTTP_PORT=3200
+      GF_SERVER_HTTP_PORT: 3200
+      GF_SECURITY_ADMIN_USER: $GF_SECURITY_ADMIN_USER
+      GF_SECURITY_ADMIN_PASSWORD: $GF_SECURITY_ADMIN_PASSWORD
     networks:
       - medical-center-network
     restart: always
