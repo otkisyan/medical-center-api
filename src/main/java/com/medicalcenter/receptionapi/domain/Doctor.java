@@ -37,6 +37,9 @@ public class Doctor {
   @Column(name = "messenger_contact", nullable = true)
   private String messengerContact;
 
+  @Column(name = "education", nullable = true)
+  private String education;
+
   @Column(name = "birth_date", nullable = false)
   private LocalDate birthDate;
 

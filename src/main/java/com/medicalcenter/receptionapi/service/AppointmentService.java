@@ -202,7 +202,9 @@ public class AppointmentService {
 
   private boolean isAppointmentWithinWorkSchedule(
       AppointmentRequestDto appointmentRequestDto, WorkSchedule workSchedule) {
-    if (workSchedule.getWorkTimeStart() == null || workSchedule.getWorkTimeEnd() == null) {
+    if (workSchedule == null
+        || workSchedule.getWorkTimeStart() == null
+        || workSchedule.getWorkTimeEnd() == null) {
       return false;
     }
     return !appointmentRequestDto.getTimeStart().isBefore(workSchedule.getWorkTimeStart())

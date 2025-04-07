@@ -112,4 +112,4 @@ An **administrator** inherits all the functionality of a receptionist and has th
 * http://localhost:5541 - RedisInsight (host: `redis-2`, port: `6380`, password: `$REDIS_PASSWORD`)
 * http://localhost:3100 - Loki
 * http://localhost:8428 - VictoriaMetrics
-* http://localhost:3200 - Grafana (username: `$GF_SECURITY_ADMIN_USER`, password: `GF_SECURITY_ADMIN_PASSWORD`)
+* http://localhost:3200 - Grafana (username: `$GF_SECURITY_ADMIN_USER`, password: `$GF_SECURITY_ADMIN_PASSWORD`)

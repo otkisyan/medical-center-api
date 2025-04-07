@@ -17,6 +17,7 @@ public class DoctorResponseDto implements Serializable {
   private String address;
   private String phone;
   private String messengerContact;
+  private String education;
   private LocalDate birthDate;
   private String medicalSpecialty;
   private String qualificationCategory;

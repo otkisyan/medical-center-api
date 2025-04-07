@@ -15,6 +15,7 @@ public class DoctorRequestDto implements Serializable {
   @NotNull private String address;
   @NotNull private String phone;
   private String messengerContact;
+  private String education;
   @NotNull private LocalDate birthDate;
   @NotNull private String medicalSpecialty;
   private String qualificationCategory;
