@@ -90,13 +90,13 @@ public class WebSecurityConfig {
                         RoleAuthority.DOCTOR.toString())
                     .requestMatchers(HttpMethod.POST, "/offices")
                     .hasAnyRole(
-                        RoleAuthority.ADMIN.toString(), RoleAuthority.RECEPTIONIST.toString())
+                        RoleAuthority.ADMIN.toString())
                     .requestMatchers(HttpMethod.PUT, "/offices/{id}")
                     .hasAnyRole(
-                        RoleAuthority.ADMIN.toString(), RoleAuthority.RECEPTIONIST.toString())
+                        RoleAuthority.ADMIN.toString())
                     .requestMatchers(HttpMethod.DELETE, "/offices/{id}")
                     .hasAnyRole(
-                        RoleAuthority.ADMIN.toString(), RoleAuthority.RECEPTIONIST.toString())
+                        RoleAuthority.ADMIN.toString())
                     // Work Schedules
                     .requestMatchers(HttpMethod.PUT, "/work-schedules/**")
                     .hasAnyRole(
