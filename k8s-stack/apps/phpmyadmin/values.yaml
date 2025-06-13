@@ -1,0 +1,11 @@
+fullnameOverride: phpmyadmin
+service:
+  ports: 
+    http: 8084
+    https: 44301
+db:
+  host: mariadb
+  port: 3307 
+
+ingress:
+  enabled: true

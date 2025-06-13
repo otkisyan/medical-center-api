@@ -1,0 +1,13 @@
+fullnameOverride: mariadb
+auth:
+  user: "user"
+  rootPassword: "root"
+  password: "password123"
+  database: medical-center-api
+primary:
+  service:
+    ports:
+      mysql: 3307
+passwordUpdateJob:
+  enabled: false
+

@@ -1,6 +1,6 @@
 spring:
-#  config:
-#    import: optional:file:.env.dev[.properties]
+  config:
+    import: optional:file:.env.dev[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: root
@@ -29,6 +29,9 @@ management:
         include:
           - health
           - prometheus
+  metrics:
+    tags:
+      application: medical-center-api
 server:
   port: 8080
 security:

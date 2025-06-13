@@ -1,0 +1,43 @@
+spring:
+  datasource:
+    url: "jdbc:mariadb://mariadb:3307/medical-center-api"
+    username: "root"
+    password: "root"
+  data: 
+    redis:
+      host: "redis-master"
+      password: "password"
+      port: 6380
+security:
+  jwt: 
+    secret: "JSh2712Wrfewdw!@24dSff21ASJD@*167263761@42iyushdahHSDT7t72761@367611uhjdbFfasdDFaSDa221"
+    accessTokenExpiration: "900000"
+    refreshTokenExpiration: "2678400000"
+cors:
+  allowedOrigins: "https://localhost:3001,http://localhost:3001"
+
+image:
+  repository: vadyanapp/medical-center-api
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 8080
+
+fullnameOverride: "medical-center-api"
+nameOverride: ""
+
+resources:
+  requests:
+    memory: "600Mi"
+    cpu: "250m"
+  limits:
+    memory: "1500Mi"
+    cpu: "500m"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

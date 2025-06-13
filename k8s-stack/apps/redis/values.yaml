@@ -1,0 +1,7 @@
+fullnameOverride: redis
+master:
+  service: 
+    ports:
+      redis: 6380
+auth: 
+  password: "password"

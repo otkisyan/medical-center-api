@@ -1,0 +1,12 @@
+vmagent: 
+  extraVolumes:
+    - name: prometheus-config 
+      configMap:
+        name: prometheus-config
+  extraVolumeMounts:
+    - name: prometheus-config
+      mountPath: /etc/prometheus
+      readOnly: true
+  extraArgs:
+    - "--promscrape.config=/etc/prometheus/prometheus.yml"
+    - "--remoteWrite.url=http://vminsert:8480/insert/1/prometheus/api/v1/write"

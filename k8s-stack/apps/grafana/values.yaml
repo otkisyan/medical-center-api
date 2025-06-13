@@ -1,0 +1,51 @@
+service:
+  ports: 
+    grafana: 3200
+
+persistence:
+  enabled: true
+  size: 10Gi
+ 
+admin:
+  user: admin
+  password: admin
+
+dashboardsProvider:
+  enabled: true
+  configMapName: provisioning-dashboards
+
+dashboardsConfigMaps: 
+  - configMapName: spring-boot-observability
+    fileName: Spring-Boot-Observability-1749566780151.json
+  - configMapName: jvm-micrometer
+    fileName: JVM-Micrometer-1743004313936.json
+
+datasources:
+  secretName: grafana-datasources
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+
+# grafana: 
+#   extraVolumes:
+#     - name: provisioning-datasources
+#       configMap:
+#         name: provisioning-datasources  
+#     - name: provisioning-dashboards
+#       configMap:
+#         name: provisioning-dashboards
+#     - name: grafana-dashboards
+#       configMap:
+#         name: grafana-dashboards
+#
+#   extraVolumeMounts:
+#     - name: provisioning-datasources
+#       mountPath: /etc/grafana/provisioning/datasources
+#       readOnly: true 
+#     - name: provisioning-dashboards
+#       mountPath: /etc/grafana/provisioning/dashboards
+#       readOnly: true 
+#     - name: grafana-dashboards
+#       mountPath: /var/lib/grafana/dashboards
+#       readOnly: true 
