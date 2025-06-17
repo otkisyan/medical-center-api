@@ -11,10 +11,20 @@ spring:
 security:
   jwt: 
     secret: "JSh2712Wrfewdw!@24dSff21ASJD@*167263761@42iyushdahHSDT7t72761@367611uhjdbFfasdDFaSDa221"
-    accessTokenExpiration: "900000"
-    refreshTokenExpiration: "2678400000"
+    accessToken:
+      expiration: "900000"
+    refreshToken: 
+      expiration: "2678400000"
+      cookie:
+        name: refreshToken
+        domain: medical-center-reception.local
+        sameSite: Lax
+        path: /
+        httpOnly: true
+        secure: false
+
 cors:
-  allowedOrigins: "https://localhost:3001,http://localhost:3001"
+  allowedOrigins: "https://localhost:3001,http://localhost:3001,http://medical-center-reception.local,https://medical-center-reception.local"
 
 image:
   repository: vadyanapp/medical-center-api

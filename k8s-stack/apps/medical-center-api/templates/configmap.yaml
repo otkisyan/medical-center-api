@@ -4,10 +4,15 @@ metadata:
   name: {{ include "medical-center-api.fullname" . }}-config
 data:
   SPRING_DATASOURCE_URL: {{ .Values.spring.datasource.url | quote }}
-  SPRING_DATASOURCE_USERNAME: {{ .Values.spring.datasource.username | quote }}
   SPRING_DATA_REDIS_HOST: {{ .Values.spring.data.redis.host | quote }}
   SPRING_DATA_REDIS_PORT: {{ .Values.spring.data.redis.port | quote }}
-  SECURITY_JWT_ACCESS_TOKEN_EXPIRATION: {{ .Values.security.jwt.accessTokenExpiration | quote }}
-  SECURITY_JWT_REFRESH_TOKEN_EXPIRATION: {{ .Values.security.jwt.refreshTokenExpiration | quote }}
+  SECURITY_JWT_ACCESS_TOKEN_EXPIRATION: {{ .Values.security.jwt.accessToken.expiration | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_EXPIRATION: {{ .Values.security.jwt.refreshToken.expiration | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_COOKIE_NAME: {{ .Values.security.jwt.refreshToken.cookie.name | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_COOKIE_DOMAIN: {{ .Values.security.jwt.refreshToken.cookie.domain | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_COOKIE_SAME_SITE: {{ .Values.security.jwt.refreshToken.cookie.sameSite | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_COOKIE_PATH: {{ .Values.security.jwt.refreshToken.cookie.path | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_COOKIE_HTTP_ONLY: {{ .Values.security.jwt.refreshToken.cookie.httpOnly | quote }}
+  SECURITY_JWT_REFRESH_TOKEN_COOKIE_SECURE: {{ .Values.security.jwt.refreshToken.cookie.secure | quote }}
   CORS_ALLOWED_ORIGINS: {{ .Values.cors.allowedOrigins | quote }}
 

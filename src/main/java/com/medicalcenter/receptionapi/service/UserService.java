@@ -9,13 +9,12 @@ import com.medicalcenter.receptionapi.repository.RoleRepository;
 import com.medicalcenter.receptionapi.repository.UserRepository;
 import com.medicalcenter.receptionapi.security.CustomUserDetails;
 import com.medicalcenter.receptionapi.security.JwtTokenProvider;
-import com.medicalcenter.receptionapi.security.constants.SecurityConstants;
+import com.medicalcenter.receptionapi.security.RefreshTokenCookieProperties;
 import com.medicalcenter.receptionapi.security.enums.JwtType;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Random;
-import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +28,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-@AllArgsConstructor
 public class UserService {
   private final BCryptPasswordEncoder encoder;
   private final AuthenticationManager authenticationManager;
@@ -39,6 +37,28 @@ public class UserService {
   private final RoleRepository roleRepository;
   private final RefreshSessionRepository refreshSessionRepository;
   private final UserMapper userMapper;
+  private final RefreshTokenCookieProperties refreshTokenCookieProperties;
+
+  public UserService(
+      BCryptPasswordEncoder encoder,
+      AuthenticationManager authenticationManager,
+      JwtTokenProvider jwtTokenProvider,
+      UserDetailsService userDetailsService,
+      UserRepository userRepository,
+      RoleRepository roleRepository,
+      RefreshSessionRepository refreshSessionRepository,
+      UserMapper userMapper,
+      RefreshTokenCookieProperties refreshTokenCookieProperties) {
+    this.encoder = encoder;
+    this.authenticationManager = authenticationManager;
+    this.jwtTokenProvider = jwtTokenProvider;
+    this.userDetailsService = userDetailsService;
+    this.userRepository = userRepository;
+    this.roleRepository = roleRepository;
+    this.refreshSessionRepository = refreshSessionRepository;
+    this.userMapper = userMapper;
+    this.refreshTokenCookieProperties = refreshTokenCookieProperties;
+  }
 
   /**
    * Saves a new user to the DB on the provided registration {@link RegisterRequestDto}
@@ -226,23 +246,34 @@ public class UserService {
 
   private ResponseCookie createRefreshTokenCookie(TokenDto refreshToken) {
     long expiresInSec = refreshToken.getExpiresInMs() / 1000;
-    return ResponseCookie.from(SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, refreshToken.getToken())
-        .httpOnly(true)
-        .secure(true)
-        .path(SecurityConstants.REFRESH_TOKEN_COOKIE_PATH)
-        .maxAge(expiresInSec)
-        .sameSite("None")
-        .build();
+    ResponseCookie.ResponseCookieBuilder builder =
+        ResponseCookie.from(refreshTokenCookieProperties.getName(), refreshToken.getToken())
+            .httpOnly(refreshTokenCookieProperties.isHttpOnly())
+            .secure(refreshTokenCookieProperties.isSecure())
+            .path(refreshTokenCookieProperties.getPath())
+            .maxAge(expiresInSec)
+            .sameSite(refreshTokenCookieProperties.getSameSite());
+    setRefreshTokenCookieDomain(builder);
+    return builder.build();
   }
 
   private ResponseCookie createEmptyRefreshTokenCookie() {
-    return ResponseCookie.from(SecurityConstants.REFRESH_TOKEN_COOKIE_NAME, "")
-        .httpOnly(true)
-        .secure(true)
-        .path(SecurityConstants.REFRESH_TOKEN_COOKIE_PATH)
-        .maxAge(0)
-        .sameSite("None")
-        .build();
+    ResponseCookie.ResponseCookieBuilder builder =
+        ResponseCookie.from(refreshTokenCookieProperties.getName(), "")
+            .httpOnly(refreshTokenCookieProperties.isHttpOnly())
+            .secure(refreshTokenCookieProperties.isSecure())
+            .path(refreshTokenCookieProperties.getPath())
+            .maxAge(0)
+            .sameSite(refreshTokenCookieProperties.getSameSite());
+    setRefreshTokenCookieDomain(builder);
+    return builder.build();
+  }
+
+  private void setRefreshTokenCookieDomain(ResponseCookie.ResponseCookieBuilder builder) {
+    String domain = refreshTokenCookieProperties.getDomain();
+    if (domain != null && !domain.equalsIgnoreCase("localhost")) {
+      builder.domain(domain);
+    }
   }
 
   private User findUserByUsername(String username) {

@@ -1,6 +1,6 @@
 spring:
-  config:
-    import: optional:file:.env.dev[.properties]
+#  config:
+#    import: optional:file:.env.dev[.properties]
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: root
@@ -41,5 +41,12 @@ security:
       expiration: ${JWT_ACCESS_TOKEN_EXPIRATION}
     refresh-token:
       expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+      cookie:
+        name: ${JWT_REFRESH_TOKEN_COOKIE_NAME}
+        domain: ${JWT_REFRESH_TOKEN_COOKIE_DOMAIN:localhost}
+        same-site: ${JWT_REFRESH_TOKEN_COOKIE_SAME_SITE}
+        path: ${JWT_REFRESH_TOKEN_COOKIE_PATH}
+        http-only: ${JWT_REFRESH_TOKEN_COOKIE_HTTP_ONLY}
+        secure: ${JWT_REFRESH_TOKEN_COOKIE_SECURE}
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS}
