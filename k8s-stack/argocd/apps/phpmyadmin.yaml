@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: phpmyadmin 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: phpmyadmin 
+      repoURL: registry-1.docker.io/bitnamicharts  
+      targetRevision: 18.1.8
+      helm:
+        valueFiles:
+          - $values/k8s-stack/values/phpmyadmin/values.yaml
+    - repoURL: 'https://github.com/otkisyan/medical-center-api.git'
+      targetRevision: master 
+      ref: values
+  destination:
+    name: "in-cluster"
+    namespace: default
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

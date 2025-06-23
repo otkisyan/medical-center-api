@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: medical-center-api
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/otkisyan/medical-center-api.git' 
+    path: k8s-stack/charts/medical-center-api
+    targetRevision: master
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    name: "in-cluster"
+    namespace: default
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

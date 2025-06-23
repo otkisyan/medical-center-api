@@ -7,39 +7,39 @@ releases:
     chart: oci://registry-1.docker.io/bitnamicharts/mariadb 
     version: "20.5.6"
     values:
-      - apps/mariadb/values.yaml
+      - values/mariadb/values.yaml
   - name: phpmyadmin
     chart: oci://registry-1.docker.io/bitnamicharts/phpmyadmin
     version: "18.1.8"
     values: 
-      - apps/phpmyadmin/values.yaml
+      - values/phpmyadmin/values.yaml
   - name: redis
     chart: oci://registry-1.docker.io/bitnamicharts/redis
     version: "21.1.11"
     values:
-      - apps/redis/values.yaml
-  - name: medical-center-api
-    chart: apps/medical-center-api
-    version: "1.0.0"  
-    values:
-      - apps/medical-center-api/values.yaml
-  - name: grafana
-    chart: oci://registry-1.docker.io/bitnamicharts/grafana
-    version: "12.0.5"
-    values: 
-      - apps/grafana/values.yaml
+      - values/redis/values.yaml
   - name: victoriametrics
     chart: oci://registry-1.docker.io/bitnamicharts/victoriametrics
     version: "0.1.15"
     values: 
-      - apps/victoriametrics/values.yaml
+      - values/victoriametrics/values.yaml
+  - name: grafana
+    chart: oci://registry-1.docker.io/bitnamicharts/grafana
+    version: "12.0.5"
+    values: 
+      - values/grafana/values.yaml
   - name: loki
     chart: grafana/loki
     version: "6.30.1"
     values: 
-      - apps/loki/values.yaml
+      - values/grafana-loki/values.yaml
   - name: grafana-alloy
     chart: grafana/alloy
     version: "1.1.1"
     values:
-      - apps/grafana-alloy/values.yaml
+      - values/grafana-alloy/values.yaml
+  - name: medical-center-api
+    chart: charts/medical-center-api
+    version: "1.0.0"  
+    values:
+      - charts/medical-center-api/values.yaml

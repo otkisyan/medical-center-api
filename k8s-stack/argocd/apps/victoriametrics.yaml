@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: victoriametrics 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: victoriametrics 
+      repoURL: registry-1.docker.io/bitnamicharts  
+      targetRevision: 0.1.15
+      helm:
+        valueFiles:
+          - $values/k8s-stack/values/victoriametrics/values.yaml
+    - repoURL: 'https://github.com/otkisyan/medical-center-api.git'
+      targetRevision: master 
+      ref: values
+  destination:
+    name: "in-cluster"
+    namespace: default
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

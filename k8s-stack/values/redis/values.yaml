@@ -5,3 +5,6 @@ master:
       redis: 6380
 auth: 
   password: "password"
+
+replica: 
+  replicaCount: 1

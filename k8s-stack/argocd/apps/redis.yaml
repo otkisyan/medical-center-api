@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: redis 
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - chart: redis 
+      repoURL: registry-1.docker.io/bitnamicharts  
+      targetRevision: 21.1.11
+      helm:
+        valueFiles:
+          - $values/k8s-stack/values/redis/values.yaml
+    - repoURL: 'https://github.com/otkisyan/medical-center-api.git'
+      targetRevision: master 
+      ref: values
+  destination:
+    name: "in-cluster"
+    namespace: default
+  project: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
