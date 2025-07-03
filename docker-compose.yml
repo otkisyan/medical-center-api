@@ -26,6 +26,7 @@ services:
     ports:
       - "8084:8082"
     environment:
+      - DATABASE_HOST=mariadb-2
       - DATABASE_PORT_NUMBER=3307
       - APACHE_HTTP_PORT_NUMBER=8082
     depends_on:
