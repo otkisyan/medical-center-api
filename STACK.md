@@ -1,0 +1,21 @@
+# Stack
+
+- Java
+- MariaDB, Flyway Migration
+- Redis (for cache)
+- Spring Boot:
+    - Spring Web: RESTful
+    - Spring Data JPA
+    - Spring Security: JSON Web Tokens (JWT) authorization
+    - Actuator
+- Testing: JUnit, Mockito, Testcontainers, JaCoCo, CodeCov
+- Observability: VictoriaMetrics, Loki, Grafana, Alloy
+- Docker Compose
+- K8s Deployment With Helm Charts, ArgoCD
+- CI (GitHub Actions):
+    - Jobs:
+        - lint: Performs code quality checks using Checkstyle and enforces Google Java Style.
+        - liberica: Compiles the project and runs tests using different Liberica JDK versions (17, 18, 21)
+        - temurin: Compiles the project and runs tests using different Temurin JDK versions (17, 18, 21)
+        - code-coverage: Runs tests and collects code coverage using JaCoCo. After successful execution, uploads the coverage report to Codecov for analysis.
+        - build: After successful testing, it builds and packages the project, then creates and pushes a Docker image to Docker Hub.
