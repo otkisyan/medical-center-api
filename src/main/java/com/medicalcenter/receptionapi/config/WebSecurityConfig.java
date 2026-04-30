@@ -39,6 +39,8 @@ public class WebSecurityConfig {
                 requests
                     .requestMatchers("/actuator/**")
                     .permitAll()
+                        .requestMatchers("/.well-known/**")
+                        .permitAll()
                     // Patients
                     .requestMatchers("/patients/**")
                     .hasAnyRole(

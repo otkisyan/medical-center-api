@@ -8,9 +8,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -20,14 +24,20 @@ public class JwtTokenProvider {
   private final String jwtSecret;
   private final long jwtAccessTokenExpiration;
   private final long jwtRefreshTokenExpiration;
+  private final PrivateKey privateKey;
+  private final PublicKey publicKey;
 
   public JwtTokenProvider(
       @Value("${security.jwt.secret}") String jwtSecret,
       @Value("${security.jwt.access-token.expiration}") long jwtAccessTokenExpiration,
-      @Value("${security.jwt.refresh-token.expiration}") long jwtRefreshTokenExpiration) {
+      @Value("${security.jwt.refresh-token.expiration}") long jwtRefreshTokenExpiration,
+      PrivateKey privateKey,
+      PublicKey publicKey) {
     this.jwtSecret = jwtSecret;
     this.jwtAccessTokenExpiration = jwtAccessTokenExpiration;
     this.jwtRefreshTokenExpiration = jwtRefreshTokenExpiration;
+    this.privateKey = privateKey;
+    this.publicKey = publicKey;
   }
 
   public TokenDto generateAccessToken(UserDetails userDetails) {
@@ -40,6 +50,8 @@ public class JwtTokenProvider {
 
   public TokenDto buildToken(UserDetails userDetails, long tokenExpiration, JwtType jwtType) {
     CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+    List<String> roles =
+        customUserDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
     Date currentDate = new Date();
     Date expirationDate = new Date(currentDate.getTime() + tokenExpiration);
     String token =
@@ -47,9 +59,10 @@ public class JwtTokenProvider {
             .setSubject(customUserDetails.getUsername())
             .claim("userId", customUserDetails.getId())
             .claim("type", jwtType)
+            .claim("roles", roles)
             .setIssuedAt(currentDate)
             .setExpiration(expirationDate)
-            .signWith(SignatureAlgorithm.HS256, jwtSecret)
+            .signWith(SignatureAlgorithm.RS256, privateKey)
             .compact();
     return TokenDto.builder()
         .token(token)
@@ -98,7 +111,7 @@ public class JwtTokenProvider {
 
   public boolean validateToken(String token) {
     try {
-      Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token);
+      Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token);
       return true;
     } catch (Exception ex) {
       return false;
@@ -106,7 +119,7 @@ public class JwtTokenProvider {
   }
 
   private Claims extractAllClaims(String token) {
-    return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody();
+    return Jwts.parser().setSigningKey(publicKey).parseClaimsJws(token).getBody();
   }
 
   private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {

@@ -14,14 +14,16 @@ spring:
     hibernate:
       ddl-auto: validate
   cache:
-    type: redis
+    type: none
     redis:
       time-to-live: 30m
   data:
     redis:
       host: ${REDIS_HOST}
-      port: 6380
+      port: ${REDIS_PORT}
       password: ${REDIS_PASSWORD}
+      ssl:
+        enabled: ${REDIS_SSL_ENABLED}
 management:
   endpoints:
     web:
